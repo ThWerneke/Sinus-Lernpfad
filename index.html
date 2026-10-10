@@ -1,0 +1,2209 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sinusfunktionen transformieren</title>
+<!--
+  ============================================================================
+  LERNPFAD „Sinusfunktionen transformieren“
+  ----------------------------------------------------------------------------
+  HINWEISE FÜR LEHRKRÄFTE
+
+  1) KI-Tutor verknüpfen
+     Im <script>-Bereich ganz oben steht:   kiTutorUrl: ""
+     Tragen Sie zwischen die Anführungszeichen den Link ein, über den Ihre
+     Schülerinnen und Schüler den fobizz-KI-Assistenten öffnen (z. B. den
+     Link zum fobizz-Klassenraum). Datei speichern, fertig.
+     Ohne Link kopiert der Knopf „KI-Tutor fragen“ die Frage nur in die
+     Zwischenablage; die Schülerinnen und Schüler fügen sie dann selbst im
+     KI-Tutor ein.
+     Wird die Datei über einen Webserver bereitgestellt, kann der Link auch
+     als Parameter angehängt werden: ...html?ki=https://...
+
+  2) Datenschutz
+     Die Datei lädt keine externen Dateien (keine Schriften, keine Skripte,
+     keine Tracker). Der Lernfortschritt wird nur lokal im Browser des
+     Geräts gespeichert (localStorage) und nirgendwohin übertragen.
+
+  3) Verteilung
+     Die Datei kann z. B. in Moodle/LOGINEO als Datei hochgeladen, per Link
+     geteilt oder lokal geöffnet werden. Keine Anmeldung nötig.
+  ============================================================================
+-->
+<style>
+/* Layout: Karopapier als Grund wie im Heft, links der Lernpfad, rechts ein Blatt mit dem aktuellen Schritt.
+   Farben der Graphen folgen dem Schulbuch: f blau, g orange, h grün, i violett, j rot. */
+:root{
+  --paper:#F2F5F8;
+  --grid:rgba(58,96,138,.085);
+  --sheet:#FFFFFF;
+  --ink:#16202B;
+  --muted:#556375;
+  --line:#D2DBE4;
+  --accent:#1A6AA3;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#E6F0F8;
+  --ok:#1E7344; --ok-soft:#E3F2E8;
+  --err:#AE2A21; --err-soft:#FBE8E6;
+  --warn:#8C5110; --warn-soft:#FBF0DE;
+  --pl-minor:#E8EDF2; --pl-major:#CCD5DE; --pl-axis:#26303B;
+  --c-f:#2A7AB8; --c-g:#D88F0C; --c-h:#36964C; --c-i:#88489A; --c-j:#CF283B; --c-ref:#97A1AE;
+  --qr-bg:#FFFFFF; --qr-fg:#000000;
+  --font-ui:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-head:"Avenir Next","Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --font-math:"Cambria Math",Cambria,"STIX Two Math","STIX Two Text","Latin Modern Math","Times New Roman",serif;
+  --font-mono:ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F141A; --grid:rgba(140,170,205,.06); --sheet:#171F28; --ink:#E4EAF1; --muted:#9AA7B6; --line:#2C3846;
+    --accent:#6DB3E8; --accent-ink:#0C1620; --accent-soft:#1A2B3A;
+    --ok:#5CC48A; --ok-soft:#14301F; --err:#F2857A; --err-soft:#3B1D1A; --warn:#E5A75B; --warn-soft:#352614;
+    --pl-minor:#1F2832; --pl-major:#2F3B48; --pl-axis:#C9D3DE;
+    --c-f:#5CA9E4; --c-g:#F1B338; --c-h:#5BC46E; --c-i:#C38AD4; --c-j:#F2606F; --c-ref:#7B8695;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F141A; --grid:rgba(140,170,205,.06); --sheet:#171F28; --ink:#E4EAF1; --muted:#9AA7B6; --line:#2C3846;
+  --accent:#6DB3E8; --accent-ink:#0C1620; --accent-soft:#1A2B3A;
+  --ok:#5CC48A; --ok-soft:#14301F; --err:#F2857A; --err-soft:#3B1D1A; --warn:#E5A75B; --warn-soft:#352614;
+  --pl-minor:#1F2832; --pl-major:#2F3B48; --pl-axis:#C9D3DE;
+  --c-f:#5CA9E4; --c-g:#F1B338; --c-h:#5BC46E; --c-i:#C38AD4; --c-j:#F2606F; --c-ref:#7B8695;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:19px 19px;
+  color:var(--ink);
+  font:16px/1.58 var(--font-ui);
+  padding-inline:16px;
+  padding-block:env(safe-area-inset-top,0px) calc(110px + env(safe-area-inset-bottom,0px));
+}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+code{font-family:var(--font-mono);font-size:.9em;background:var(--accent-soft);padding:.05em .3em}
+
+/* ---------- Kopf ---------- */
+.top{max-width:1200px;margin:0 auto;padding-block:22px 14px;display:flex;flex-wrap:wrap;gap:14px 28px;align-items:flex-end;justify-content:space-between}
+.brand{display:flex;gap:14px;align-items:center;min-width:0}
+.brand svg{width:58px;height:30px;flex:none}
+.brand svg path{fill:none;stroke:var(--c-f);stroke-width:2.6;stroke-linecap:round}
+.brand svg line{stroke:var(--ink);stroke-width:1.2}
+.kicker{margin:0;font:600 12px/1.2 var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+h1{margin:2px 0 0;font:700 clamp(22px,3.2vw,30px)/1.15 var(--font-head);letter-spacing:-.01em;text-wrap:balance}
+.prog{min-width:min(280px,100%);flex:0 1 320px}
+.prog-label{font-size:13px;color:var(--muted);margin-bottom:6px;font-variant-numeric:tabular-nums}
+.prog-bar{height:8px;background:var(--sheet);border:1px solid var(--line)}
+.prog-bar span{display:block;height:100%;width:0;background:var(--ok);transition:width .4s}
+
+/* ---------- Gerüst ---------- */
+.layout{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:262px minmax(0,1fr);gap:24px;align-items:start}
+nav.path{position:sticky;top:calc(14px + env(safe-area-inset-top,0px));background:var(--sheet);border:1px solid var(--line);padding:14px 10px 12px}
+.path-h{margin:0 8px 8px;font:600 12px/1 var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+#nav{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.nav-item{width:100%;display:grid;grid-template-columns:26px minmax(0,1fr) 18px;gap:8px;align-items:center;text-align:left;background:none;border:0;padding:7px 8px;cursor:pointer;line-height:1.3}
+.nav-item:hover{background:var(--accent-soft)}
+.nav-item .num{font:600 13px/1 var(--font-ui);width:24px;height:24px;display:grid;place-items:center;border:1.5px solid var(--line);font-variant-numeric:tabular-nums}
+.nav-item .nt{font-size:14.5px}
+.nav-item .st{font-size:14px;color:var(--ok);font-weight:700}
+.nav-item.done .st::after{content:"✓"}
+.nav-item.done .num{border-color:var(--ok);color:var(--ok)}
+.nav-item.cur{background:var(--accent-soft)}
+.nav-item.cur .num{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.nav-item.cur .nt{font-weight:600}
+.btn-quiet{margin:12px 8px 0;background:none;border:0;padding:4px 0;font-size:13px;color:var(--muted);text-decoration:underline;cursor:pointer}
+main.sheet{background:var(--sheet);border:1px solid var(--line);padding:clamp(18px,3.4vw,38px) clamp(16px,4vw,44px) 30px;min-width:0}
+@media (max-width:880px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:14px}
+  nav.path{position:static;padding:10px 0 8px}
+  .path-h{margin:0 12px 8px}
+  #nav{flex-direction:row;overflow-x:auto;gap:4px;padding:0 10px 6px;scrollbar-width:thin}
+  #nav li{flex:none}
+  .nav-item{grid-template-columns:24px auto;padding:6px 10px 6px 6px}
+  .nav-item .st{display:none}
+  .nav-item .nt{white-space:nowrap;font-size:14px}
+  .btn-quiet{margin:6px 12px 0}
+}
+
+/* ---------- Text ---------- */
+.eyebrow{margin:0 0 6px;font:600 12px/1.2 var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+h2{margin:0 0 10px;font:700 clamp(22px,2.8vw,28px)/1.2 var(--font-head);letter-spacing:-.01em;text-wrap:balance}
+h3{margin:30px 0 8px;font:700 19px/1.3 var(--font-head);text-wrap:balance}
+h4{margin:18px 0 6px;font:700 16px/1.3 var(--font-head)}
+p,li{max-width:70ch}
+.lead{font-size:17.5px;color:var(--ink)}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+ul,ol{padding-left:1.3em}
+li+li{margin-top:4px}
+
+/* Mathematik */
+.m{font-family:var(--font-math);font-size:1.08em;white-space:nowrap}
+.m i{font-style:italic}
+.m.wrap{white-space:normal}
+.fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.82em;line-height:1.12;margin:0 .08em}
+.fr>span:first-child{border-bottom:1px solid currentColor;padding:0 .14em}
+.fr>span:last-child{padding:0 .14em}
+.big{font-size:1.3em}
+.formula{display:block;margin:14px 0;padding:10px 0;font-family:var(--font-math);font-size:1.35em;text-align:center;white-space:normal}
+
+/* Tabellen */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;font-variant-numeric:tabular-nums;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 10px;text-align:center;vertical-align:middle}
+th{background:var(--accent-soft);font-weight:600;text-align:left}
+td.l{text-align:left}
+
+/* Kästen */
+.box{margin-block:18px;padding:14px 16px;border:1px solid var(--line);background:var(--sheet)}
+.box>:first-child{margin-top:0}
+.box>:last-child{margin-bottom:0}
+.tag{display:inline-block;margin:0 0 8px;padding:4px 7px;font:700 11px/1 var(--font-ui);letter-spacing:.09em;text-transform:uppercase}
+.merke{background:var(--accent-soft);border-color:transparent}
+.merke .tag{background:var(--accent);color:var(--accent-ink)}
+.fehler{background:var(--warn-soft);border-color:transparent}
+.fehler .tag{background:var(--warn);color:var(--sheet)}
+.tip .tag{background:var(--line);color:var(--ink)}
+.exkurs{border-style:dashed}
+.exkurs .tag{background:var(--line);color:var(--ink)}
+.buch{font-size:14px;color:var(--muted);border-style:dotted}
+.buch .tag{background:none;border:1px solid var(--line);color:var(--muted)}
+dl.facts{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:6px 16px;margin:0}
+dl.facts dt{font-weight:600}
+dl.facts dd{margin:0}
+@media (max-width:520px){dl.facts{grid-template-columns:minmax(0,1fr)} dl.facts dd{margin-bottom:6px}}
+
+/* GeoGebra */
+.gg{border:1px solid var(--line);background:linear-gradient(var(--sheet),var(--sheet))}
+.gg .tag{background:var(--ink);color:var(--sheet)}
+.gg ol{margin:6px 0 0;padding-left:1.25em}
+.gg li{margin-top:8px}
+.cmd{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:6px 0 2px}
+.cmd code{font-size:15px;padding:5px 9px;background:var(--accent-soft);border:1px solid var(--line);user-select:all;overflow-wrap:anywhere}
+.copy{border:1px solid var(--line);background:var(--sheet);padding:3px 9px;font-size:13px;cursor:pointer}
+.copy:hover{border-color:var(--accent);color:var(--accent)}
+
+/* Diagramme */
+.plot-host{margin:14px 0 6px;border:1px solid var(--line);background:var(--sheet);min-width:0}
+.plot{display:block;width:100%;height:auto}
+.plot .pl-bg{fill:var(--sheet)}
+.plot .g-min{stroke:var(--pl-minor);stroke-width:1}
+.plot .g-maj{stroke:var(--pl-major);stroke-width:1}
+.plot .axis{stroke:var(--pl-axis);stroke-width:1.4}
+.plot .axhead{fill:var(--pl-axis)}
+.plot text{font-family:var(--font-ui);font-size:12px;fill:var(--muted);paint-order:stroke;stroke:var(--sheet);stroke-width:3.5px;stroke-linejoin:round}
+.plot text.axl{font-family:var(--font-math);font-style:italic;font-size:15px;fill:var(--ink)}
+.plot text.pi{font-family:var(--font-math);font-size:13px}
+.plot .fbar{stroke:var(--muted);stroke-width:1}
+.plot .curve{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.plot text.clabel{font-family:var(--font-math);font-style:italic;font-weight:700;font-size:15px}
+.plot text.plabel{font-family:var(--font-math);font-size:13.5px;fill:var(--ink)}
+.caption{font-size:13.5px;color:var(--muted);margin:4px 0 0}
+
+/* Regler */
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 22px;margin:12px 0}
+.ctrl{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;min-width:0}
+.ctrl label{font-family:var(--font-math);font-style:italic;font-size:19px;min-width:1.2em}
+.ctrl label.wide{font-style:normal;font-family:var(--font-ui);font-size:15px}
+.ctrl input[type=range]{width:100%;accent-color:var(--accent);min-width:0}
+.ctrl output{font-family:var(--font-math);font-size:17px;min-width:3.6em;text-align:right;font-variant-numeric:tabular-nums}
+.readout{margin:8px 0;padding:10px 14px;background:var(--accent-soft);font-size:15.5px}
+.readout .m{white-space:normal}
+.eq-live{font-family:var(--font-math);font-size:1.3em;margin:4px 0 6px}
+
+/* Knöpfe */
+.btn{display:inline-flex;align-items:center;gap:6px;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:8px 16px;font-weight:600;cursor:pointer;text-decoration:none;line-height:1.25}
+.btn:hover{filter:brightness(1.08)}
+.btn.sec{background:var(--sheet);color:var(--accent)}
+.btn.sec:hover{background:var(--accent-soft);filter:none}
+.btn.small{padding:5px 11px;font-size:14px}
+.btn[disabled]{opacity:.45;cursor:default}
+.row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.seg{display:inline-flex;flex-wrap:wrap;border:1.5px solid var(--accent)}
+.seg button{border:0;background:var(--sheet);color:var(--accent);padding:6px 12px;cursor:pointer;font-weight:600;font-size:14px}
+.seg button+button{border-left:1.5px solid var(--accent)}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink)}
+
+/* Aufgaben */
+.quiz{margin-block:22px;border:1px solid var(--line);border-top:3px solid var(--ink);padding:14px 16px 14px;background:var(--sheet)}
+.quiz.is-ok{border-top-color:var(--ok)}
+.quiz.is-shown{border-top-color:var(--warn)}
+.q-head{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:6px}
+.q-num{font:700 12px/1.2 var(--font-ui);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.q-state{font-size:13px;font-weight:600}
+.quiz.is-ok .q-state{color:var(--ok)}
+.quiz.is-shown .q-state{color:var(--warn)}
+.q-text{margin:0 0 10px}
+.mc{display:grid;gap:8px}
+.mc button{text-align:left;border:1.5px solid var(--line);background:var(--sheet);padding:9px 12px;cursor:pointer;line-height:1.4}
+.mc button:hover:not([disabled]){border-color:var(--accent)}
+.mc button.bad{border-color:var(--err);background:var(--err-soft)}
+.mc button.good{border-color:var(--ok);background:var(--ok-soft)}
+.mc button[disabled]{cursor:default}
+.mc.graphs{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.mc.graphs button{padding:8px}
+.mc.graphs .plot-host{margin:0 0 6px;border:0}
+.fields{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.fields.cloze{display:block;line-height:2.5}
+.fields label{display:inline-flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.fld{display:inline-flex;align-items:stretch;vertical-align:middle}
+input.ans{width:7.2em;padding:5px 8px;border:1.5px solid var(--line);background:var(--sheet);font-family:var(--font-math);font-size:17px;min-width:0}
+input.ans.short{width:4.6em}
+select.ans{padding:5px 6px;border:1.5px solid var(--line);background:var(--sheet);font-size:15px}
+.ans.good{border-color:var(--ok);background:var(--ok-soft)}
+.ans.bad{border-color:var(--err);background:var(--err-soft)}
+.pi-btn{border:1.5px solid var(--line);border-left:0;background:var(--accent-soft);padding:0 8px;font-family:var(--font-math);font-size:16px;cursor:pointer}
+.pi-btn:hover{color:var(--accent)}
+.q-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.fb{margin-top:10px;font-size:15px}
+.fb:empty{display:none}
+.fb.good{color:var(--ok)}
+.fb.bad{color:var(--err)}
+.fb.info{color:var(--ink)}
+.fb .sol{margin-top:8px;padding:10px 12px;background:var(--warn-soft);color:var(--ink)}
+.fb .hint{margin-top:8px;padding:10px 12px;background:var(--accent-soft);color:var(--ink)}
+.fb ul{margin:6px 0 0;padding-left:1.2em}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font-size:14px}
+textarea{width:100%;min-height:110px;padding:8px 10px;border:1.5px solid var(--line);background:var(--sheet);resize:vertical;line-height:1.5}
+
+/* Teilschritte (Beispiele) */
+.stepper{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.stepper button:not(.btn){border:1.5px solid var(--line);background:var(--sheet);padding:5px 10px;font-size:14px;cursor:pointer}
+.stepper button:not(.btn)[aria-pressed=true]{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+.stage-text{min-height:3.2em;padding:10px 14px;border-left:3px solid var(--accent);background:var(--accent-soft)}
+.stage-text p{margin:0}
+.stage-text p+p{margin-top:6px}
+.result{margin-top:10px;padding:10px 14px;background:var(--ok-soft)}
+
+.step-nav{display:flex;justify-content:space-between;gap:10px;margin-top:34px;padding-top:18px;border-top:1px solid var(--line);flex-wrap:wrap}
+.counter{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0}
+.summary div{border:1px solid var(--line);padding:10px 12px}
+.summary b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.level{margin-top:34px;padding-top:4px;border-top:2px solid var(--ink)}
+.level h3{margin-top:12px}
+
+/* KI-Tutor */
+.ki-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:8px;border:0;background:var(--ink);color:var(--sheet);padding:12px 18px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.ki-fab svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2}
+@media (max-width:520px){.ki-fab{padding:9px 13px;font-size:14px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px))}}
+.ki-drawer{position:fixed;z-index:30;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--sheet);border-left:1px solid var(--line);box-shadow:-10px 0 30px rgba(0,0,0,.16);display:flex;flex-direction:column;padding:calc(16px + env(safe-area-inset-top,0px)) 18px calc(16px + env(safe-area-inset-bottom,0px));overflow-y:auto}
+.ki-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.ki-head h2{font-size:21px;margin:0}
+.x-btn{border:1px solid var(--line);background:var(--sheet);width:36px;height:36px;font-size:20px;line-height:1;cursor:pointer}
+.ki-step{margin:8px 0 12px;font-size:14px;color:var(--muted)}
+.ki-ctx{margin:0 0 10px;padding:10px 12px;background:var(--accent-soft);font-size:14px}
+.ki-ctx p{margin:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.chips button{border:1px solid var(--line);background:var(--sheet);padding:4px 10px;font-size:13.5px;cursor:pointer}
+.chips button:hover{border-color:var(--accent)}
+.ki-preview{white-space:pre-wrap;font-family:var(--font-mono);font-size:12.5px;background:var(--paper);border:1px solid var(--line);padding:10px;margin:10px 0;overflow-wrap:anywhere}
+.ki-actions{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.ki-note{font-size:13.5px;color:var(--muted)}
+.ki-note p{margin:6px 0}
+.backdrop{position:fixed;inset:0;z-index:25;background:rgba(10,16,22,.35)}
+
+/* QR-Code für Lehrkräfte */
+details.teacher{margin-top:28px;border:1px dashed var(--line);padding:10px 14px}
+details.teacher summary{cursor:pointer;font-weight:600;color:var(--muted)}
+details.teacher[open] summary{margin-bottom:8px}
+.qr-modal{position:fixed;inset:0;z-index:40;background:var(--sheet);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:calc(20px + env(safe-area-inset-top,0px)) 16px calc(20px + env(safe-area-inset-bottom,0px));text-align:center;overflow-y:auto}
+.qr-modal h2{margin:0}
+.qr-box{background:var(--qr-bg);padding:14px;width:min(70vh,86vw,560px);max-width:100%}
+.qr-box svg{display:block;width:100%;height:auto}
+.qr-url{font-family:var(--font-mono);font-size:clamp(14px,2.2vw,20px);overflow-wrap:anywhere;max-width:60ch;user-select:all}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <svg viewBox="0 0 58 30" aria-hidden="true"><line x1="1" y1="15" x2="57" y2="15"/><path d="M3 15 C 8 1, 13 1, 16.5 15 S 25 29, 30 15 S 39 1, 43.5 15 S 52 29, 56 15"/></svg>
+    <div>
+      <p class="kicker">Lernpfad Mathematik</p>
+      <h1>Sinusfunktionen transformieren</h1>
+    </div>
+  </div>
+  <div class="prog" aria-live="polite">
+    <div class="prog-label" id="prog-text">0 von 0 Aufgaben gelöst</div>
+    <div class="prog-bar"><span id="prog-fill"></span></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="path" aria-label="Lernpfad">
+  <p class="path-h">Lernpfad</p>
+  <ol id="nav"></ol>
+  <button type="button" id="reset" class="btn-quiet">Fortschritt zurücksetzen</button>
+</nav>
+
+<main class="sheet" id="main">
+
+<!-- ======================================================= SCHRITT 0 -->
+<section class="step" id="s0" data-title="Start">
+  <p class="eyebrow">Start</p>
+  <h2>Worum es geht</h2>
+  <p class="lead">Aus dem Graphen von <span class="m">y = sin(x)</span> entstehen durch Strecken und Verschieben viele weitere Graphen. In diesem Lernpfad lernst du Schritt für Schritt, welcher Parameter was bewirkt.</p>
+  <div class="plot-host" id="p0"></div>
+  <p class="caption">Alle fünf Graphen aus dem Buch: Jeder entsteht aus dem vorherigen durch genau eine Veränderung.</p>
+
+  <h3>Am Ende kannst du …</h3>
+  <ul>
+    <li>erklären, wie die Parameter <span class="m">a, b, c</span> und <span class="m">d</span> in <span class="m">f(x) = a · sin(b · (x − c)) + d</span> den Graphen verändern,</li>
+    <li>Amplitude, Periode und Mittellage einer Sinusfunktion angeben,</li>
+    <li>den Graphen einer Sinusfunktion schrittweise aus dem Graphen von <span class="m">sin(x)</span> skizzieren (Beispiel 2 im Buch),</li>
+    <li>zu einem gegebenen Graphen eine passende Funktionsgleichung bestimmen (Beispiel 1 im Buch),</li>
+    <li>die Transformationen in vollständigen Sätzen beschreiben.</li>
+  </ul>
+
+  <h3>So arbeitest du</h3>
+  <ol>
+    <li>Lies die Erklärung und probiere die Schieberegler aus.</li>
+    <li>Bearbeite die Aufgaben. Du bekommst sofort eine Rückmeldung. Wenn du nicht weiterkommst, hilft ein Tipp.</li>
+    <li>Übertrage die Merke-Kästen in dein Heft.</li>
+    <li>Wenn etwas unklar ist, frag den KI-Tutor (Knopf unten rechts). Die Anwendung schreibt automatisch dazu, bei welchem Schritt du bist.</li>
+    <li>In den GeoGebra-Kästen steht genau, was du in GeoGebra eingeben kannst.</li>
+  </ol>
+  <p class="muted small">Du kannst jederzeit unterbrechen. Dein Fortschritt wird nur in diesem Browser auf deinem Gerät gespeichert.</p>
+
+  <div class="box tip">
+    <span class="tag">Eingaben in dieser Anwendung</span>
+    <p>π gibst du als <code>pi</code> ein oder tippst auf den π-Knopf neben dem Eingabefeld. Brüche schreibst du mit Schrägstrich, z. B. <code>3pi/4</code> oder <code>1/2</code>. Dezimalzahlen gehen mit Komma oder Punkt.</p>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">GeoGebra einrichten</span>
+    <ol>
+      <li>Öffne den GeoGebra-Grafikrechner: <a href="https://www.geogebra.org/graphing" target="_blank" rel="noopener">geogebra.org/graphing</a>. Du brauchst kein Konto.</li>
+      <li>Stelle die x-Achse auf π-Schritte um: Klicke mit der rechten Maustaste auf eine freie Stelle im Zeichenblatt (am Tablet: lange tippen) und öffne die <b>Einstellungen</b> bzw. <b>Grafik …</b>. Wähle den Reiter <b>x-Achse</b>, setze den Haken bei <b>Abstand</b> und wähle <b>π/2</b>. Die Menünamen können je nach GeoGebra-Version leicht abweichen.</li>
+      <li>Wichtige Schreibweisen in GeoGebra:
+        <ul>
+          <li>π schreibst du als <code>pi</code>.</li>
+          <li>Dezimalzahlen <b>immer mit Punkt</b>: <code>0.5</code> statt 0,5. Das Komma trennt in GeoGebra Angaben in Befehlen.</li>
+          <li>Mal-Zeichen als Stern: <code>2*sin(x)</code>.</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div class="box">
+    <span class="tag" style="background:var(--ink);color:var(--sheet)">KI-Tutor</span>
+    <p>Der KI-Tutor beantwortet deine Fragen zu diesem Lernpfad. Er gibt dir Tipps und stellt Rückfragen, verrät aber nicht einfach die Lösung. So lernst du am meisten.</p>
+    <ul>
+      <li>Tippe auf <b>KI-Tutor fragen</b> (unten rechts) oder bei einer Aufgabe auf <b>Frag den KI-Tutor dazu</b>.</li>
+      <li>Schreibe deine Frage, kopiere sie und füge sie beim KI-Tutor ein.</li>
+      <li>Gib keine persönlichen Daten ein (Name, Adresse, Telefonnummer).</li>
+      <li>Auch eine KI kann sich verrechnen. Prüfe ihre Antworten, zum Beispiel mit GeoGebra.</li>
+    </ul>
+  </div>
+
+  <details class="teacher">
+    <summary>Für Lehrkräfte: Link als QR-Code zeigen</summary>
+    <p class="small">Zeigt den Link zu dieser Seite als großen QR-Code, z. B. zum Projizieren. Die Schülerinnen und Schüler scannen ihn mit der Kamera ihres Geräts.</p>
+    <button type="button" class="btn small" id="qr-open">QR-Code anzeigen</button>
+  </details>
+</section>
+
+<!-- ======================================================= SCHRITT 1 -->
+<section class="step" id="s1" data-title="Die Grundfunktion" hidden>
+  <p class="eyebrow">Schritt 1 von 9</p>
+  <h2>Die Grundfunktion <span class="m">f(x) = sin(x)</span></h2>
+  <p class="lead">Alle Sinusfunktionen in diesem Lernpfad entstehen aus einem einzigen Graphen. Den schauen wir uns zuerst genau an.</p>
+
+  <div class="plot-host" id="p1"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r1x">x</label><input type="range" id="r1x" min="0" max="48" step="1" value="6"><output id="o1x" for="r1x"></output></div>
+  </div>
+  <div class="readout" id="ro1"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <dl class="facts">
+      <dt>Amplitude</dt><dd><span class="m">A = 1</span>: der größte Abstand des Graphen von der Mittellage.</dd>
+      <dt>Periode</dt><dd><span class="m">p = 2π</span>: nach dieser Länge wiederholt sich der Graph.</dd>
+      <dt>Mittellage</dt><dd><span class="m">y = 0</span>: die waagerechte Linie genau in der Mitte zwischen Hoch- und Tiefpunkten.</dd>
+      <dt>Nullstellen</dt><dd><span class="m">…, −π, 0, π, 2π, …</span> (alle Vielfachen von π)</dd>
+      <dt>Hochpunkte</dt><dd>bei <span class="m">x = <span class="fr">π/2</span>, <span class="fr">5π/2</span>, …</span> mit <span class="m">y = 1</span></dd>
+      <dt>Tiefpunkte</dt><dd>bei <span class="m">x = <span class="fr">3π/2</span>, <span class="fr">7π/2</span>, …</span> mit <span class="m">y = −1</span></dd>
+    </dl>
+  </div>
+
+  <h3>Eine Periode in fünf Punkten</h3>
+  <p>Der Ursprung <span class="m">O(0 | 0)</span> ist der <b>Startpunkt</b>: Hier schneidet der Graph die Mittellage und <b>steigt</b>. Von dort aus teilst du eine Periode in vier gleich lange Abschnitte, die <b>Viertelperioden</b>:</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>x</th><td><span class="m">0</span></td><td><span class="m"><span class="fr">π/2</span></span></td><td><span class="m">π</span></td><td><span class="m"><span class="fr">3π/2</span></span></td><td><span class="m">2π</span></td></tr>
+    <tr><th>sin(x)</th><td><span class="m">0</span></td><td><span class="m">1</span></td><td><span class="m">0</span></td><td><span class="m">−1</span></td><td><span class="m">0</span></td></tr>
+    <tr><th>Punkt</th><td>Mittellage, steigend</td><td>Hochpunkt</td><td>Mittellage, fallend</td><td>Tiefpunkt</td><td>Mittellage, steigend</td></tr>
+  </table></div>
+  <p>Dieses Muster brauchst du später immer wieder: Startpunkt finden, Periode in vier Teile teilen, fünf Punkte eintragen, verbinden.</p>
+
+  <div class="quiz" data-q="s1-a" data-kind="mc">
+    <p class="q-text">Nach welcher Länge wiederholt sich der Graph von <span class="m">sin(x)</span> zum ersten Mal?</p>
+    <div class="mc">
+      <button type="button" data-fb="π ist der Abstand zweier benachbarter Nullstellen. Zwischen 0 und π liegt aber nur der „Berg“, das „Tal“ fehlt noch.">π</button>
+      <button type="button" data-ok data-fb="Richtig. Die Periode von sin(x) ist p = 2π.">2π</button>
+      <button type="button" data-fb="Schau auf die Achseneinteilung: Die x-Achse ist in Vielfachen von π beschriftet.">1</button>
+      <button type="button" data-fb="Nach 4π wiederholt sich der Graph auch, aber nicht zum ersten Mal.">4π</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s1-b" data-kind="fields" data-hint="Schau in die Tabelle: Der Tiefpunkt liegt nach drei Viertelperioden." data-solution="Der erste Tiefpunkt rechts vom Ursprung liegt bei x = 3π/2 (y = −1).">
+    <p class="q-text">Gib die x-Koordinate des ersten Tiefpunkts rechts vom Ursprung an.</p>
+    <div class="fields"><label>x = <input class="ans" aria-label="x-Koordinate des Tiefpunkts" data-ans="3pi/2" data-wrong="pi/2=>Bei π/2 liegt der Hochpunkt, nicht der Tiefpunkt.|1.5=>Fehlt da ein π? Die x-Achse ist in Vielfachen von π eingeteilt.|pi=>Bei π schneidet der Graph die x-Achse. Der Tiefpunkt kommt danach."></label></div>
+  </div>
+
+  <div class="quiz" data-q="s1-c" data-kind="mc">
+    <p class="q-text">Was beschreibt die Amplitude?</p>
+    <div class="mc">
+      <button type="button" data-fb="Das ist das Doppelte der Amplitude.">den Abstand zwischen Hochpunkt und Tiefpunkt in y-Richtung</button>
+      <button type="button" data-ok data-fb="Richtig. Bei sin(x) ist die Amplitude A = 1.">den größten Abstand des Graphen von der Mittellage</button>
+      <button type="button" data-fb="Die Länge eines vollständigen Abschnitts heißt Periode.">die Länge eines Abschnitts, nach dem sich der Graph wiederholt</button>
+      <button type="button" data-fb="Das ist die Lage der Mittellage.">den y-Wert der Mittellage</button>
+    </div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Gib in die Eingabezeile ein:
+        <div class="cmd"><code>f(x)=sin(x)</code></div></li>
+      <li>Tippe auf den Graphen. GeoGebra zeigt dann besondere Punkte an (Nullstellen, Hoch- und Tiefpunkte). Alternativ per Befehl:
+        <div class="cmd"><code>Extremum(f, 0, 7)</code></div>
+        <div class="cmd"><code>Nullstelle(f, 0, 7)</code></div></li>
+      <li>Vergleiche die Punkte mit dem Merke-Kasten.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 2 -->
+<section class="step" id="s2" data-title="Parameter a: Streckung in y-Richtung" hidden>
+  <p class="eyebrow">Schritt 2 von 9</p>
+  <h2>Parameter <span class="m">a</span>: Streckung in y-Richtung</h2>
+  <p class="lead">Im Buch: <span class="m">g(x) = 2 · sin(x)</span>. Der Faktor 2 steht <b>vor</b> dem Sinus. Er verdoppelt jeden y-Wert.</p>
+
+  <div class="tbl-wrap"><table>
+    <tr><th>x</th><td><span class="m">0</span></td><td><span class="m"><span class="fr">π/2</span></span></td><td><span class="m">π</span></td><td><span class="m"><span class="fr">3π/2</span></span></td><td><span class="m">2π</span></td></tr>
+    <tr><th>sin(x)</th><td>0</td><td>1</td><td>0</td><td>−1</td><td>0</td></tr>
+    <tr><th>2 · sin(x)</th><td>0</td><td>2</td><td>0</td><td>−2</td><td>0</td></tr>
+  </table></div>
+  <p>Die Nullstellen bleiben, wo sie sind (2 · 0 = 0). Hoch- und Tiefpunkte wandern nach oben bzw. unten. Die Periode ändert sich nicht.</p>
+
+  <h3>Ausprobieren</h3>
+  <div class="plot-host" id="p2"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r2a">a</label><input type="range" id="r2a" min="-6" max="6" step="1" value="4"><output id="o2a" for="r2a"></output></div>
+  </div>
+  <div class="readout" id="ro2"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <p>Der Graph von <span class="m">y = a · sin(x)</span> entsteht aus dem Graphen von <span class="m">y = sin(x)</span> durch eine <b>Streckung in y-Richtung mit dem Faktor a</b>.</p>
+    <p>Die Amplitude ist <span class="m">A = |a|</span>. Die Periode bleibt <span class="m">p = 2π</span>.</p>
+    <p class="small">Für <span class="m">0 &lt; a &lt; 1</span> wird der Graph flacher (man sagt auch: gestaucht).</p>
+  </div>
+
+  <div class="box exkurs">
+    <span class="tag">Exkurs: negatives a</span>
+    <p>Ist <span class="m">a</span> negativ, wird der Graph zusätzlich an der x-Achse gespiegelt. Die Amplitude ist trotzdem positiv: <span class="m">y = −2 · sin(x)</span> hat die Amplitude <span class="m">A = 2</span>. Probiere es mit dem Regler aus.</p>
+  </div>
+
+  <div class="quiz" data-q="s2-a" data-kind="fields" data-hint="Die Amplitude ist der Faktor vor dem Sinus (ohne Vorzeichen)." data-solution="g(x) = 3 · sin(x) hat die Amplitude 3, k(x) = 0,5 · sin(x) hat die Amplitude 0,5.">
+    <p class="q-text">Gib die Amplituden von <span class="m">g(x) = 3 · sin(x)</span> und <span class="m">k(x) = 0,5 · sin(x)</span> an.</p>
+    <div class="fields">
+      <label>Amplitude von g: <input class="ans short" aria-label="Amplitude von g" data-ans="3" data-wrong="6=>6 wäre der Abstand vom Hochpunkt zum Tiefpunkt. Die Amplitude ist der Abstand zur Mittellage."></label>
+      <label>Amplitude von k: <input class="ans short" aria-label="Amplitude von k" data-ans="0.5" data-wrong="2=>Der Faktor 0,5 halbiert die y-Werte. Er verdoppelt sie nicht."></label>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s2-b" data-kind="mc">
+    <p class="q-text">Welche Gleichung gehört zum abgebildeten Graphen?</p>
+    <div class="plot-host" id="p2q"></div>
+    <div class="mc">
+      <button type="button" data-fb="Ein Faktor in der Klammer verändert die Periode, nicht die Höhe. Hier ist die Periode aber unverändert 2π.">y = sin(1,5x)</button>
+      <button type="button" data-fb="Dann läge die Mittellage bei y = 1,5. Hier liegt sie bei y = 0.">y = sin(x) + 1,5</button>
+      <button type="button" data-ok data-fb="Richtig. Die Hochpunkte liegen bei y = 1,5, die Periode ist 2π.">y = 1,5 · sin(x)</button>
+      <button type="button" data-fb="Lies die Hochpunkte genau ab: Sie liegen nicht bei y = 3.">y = 3 · sin(x)</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s2-c" data-kind="fields" data-hint="Der Faktor steht vor dem Sinus. Er verändert also die y-Werte." data-solution="Der Graph von k entsteht aus dem Graphen von sin(x) durch eine Streckung in y-Richtung mit dem Faktor 0,5.">
+    <p class="q-text">Vervollständige die Beschreibung.</p>
+    <div class="fields cloze">
+      Der Graph von <span class="m">k(x) = 0,5 · sin(x)</span> entsteht aus dem Graphen von <span class="m">sin(x)</span> durch eine
+      <select class="ans" aria-label="Art der Transformation" data-ans="Streckung"><option value="">wählen …</option><option>Streckung</option><option>Verschiebung</option></select>
+      in
+      <select class="ans" aria-label="Richtung" data-ans="y"><option value="">…</option><option>x</option><option>y</option></select>-Richtung
+      mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor" data-ans="0.5"></span>.
+    </div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Lege einen Schieberegler für a an:
+        <div class="cmd"><code>a=Schieberegler(-3, 3, 0.5)</code></div>
+        <span class="small muted">Falls der Befehl nicht erkannt wird: <code>a=1</code> eingeben. Auch dann erscheint ein Schieberegler.</span></li>
+      <li>Gib die Funktion ein:
+        <div class="cmd"><code>f(x)=sin(x)</code></div>
+        <div class="cmd"><code>g(x)=a*sin(x)</code></div></li>
+      <li>Bewege den Regler. Was passiert bei <span class="m">a = 0,5</span>? Was bei <span class="m">a = −1</span>?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 3 -->
+<section class="step" id="s3" data-title="Parameter b: Streckung in x-Richtung" hidden>
+  <p class="eyebrow">Schritt 3 von 9</p>
+  <h2>Parameter <span class="m">b</span>: Streckung in x-Richtung</h2>
+  <p class="lead">Im Buch: <span class="m">h(x) = 2 · sin(<span class="fr">1/2</span>x)</span>. Der Faktor <span class="m">b = <span class="fr">1/2</span></span> steht <b>in</b> der Klammer, direkt beim x.</p>
+
+  <h3>Warum wird die Periode größer?</h3>
+  <p>Für eine volle Welle muss das, was in der Klammer steht, von 0 bis 2π laufen. Bei <span class="m"><span class="fr">1/2</span>x</span> passiert das erst, wenn <span class="m">x</span> von 0 bis 4π läuft. Der Graph braucht also doppelt so lange für eine Periode:</p>
+  <p class="formula">p = 2π : <span class="fr">1/2</span> = 2π · 2 = 4π</p>
+
+  <h3>Ausprobieren</h3>
+  <div class="plot-host" id="p3"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r3b">b</label><input type="range" id="r3b" min="0" max="4" step="1" value="0"><output id="o3b" for="r3b"></output></div>
+  </div>
+  <div class="readout" id="ro3"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <p>Der Graph von <span class="m">y = sin(b · x)</span> (mit <span class="m">b &gt; 0</span>) entsteht aus dem Graphen von <span class="m">y = sin(x)</span> durch eine <b>Streckung in x-Richtung mit dem Faktor <span class="m"><span class="fr">1/b</span></span></b>.</p>
+    <p class="formula">p = <span class="fr">2π/b</span> &nbsp;&nbsp; und umgekehrt &nbsp;&nbsp; b = <span class="fr">2π/p</span></p>
+    <p class="small">Für <span class="m">0 &lt; b &lt; 1</span> wird der Graph breiter, die Periode größer. Für <span class="m">b &gt; 1</span> wird er schmaler (gestaucht), die Periode kleiner.</p>
+  </div>
+
+  <div class="box fehler">
+    <span class="tag">Typischer Fehler</span>
+    <p>„Größeres b, längere Periode“ stimmt nicht. Es ist genau umgekehrt, denn durch b wird <b>geteilt</b>: <span class="m">sin(2x)</span> hat die Periode <span class="m">π</span>, nicht 4π.</p>
+  </div>
+
+  <div class="quiz" data-q="s3-a" data-kind="fields" data-hint="Teile 2π durch den Faktor vor dem x." data-solution="p = 2π : 2 = π">
+    <p class="q-text">Bestimme die Periode von <span class="m">y = sin(2x)</span>.</p>
+    <div class="fields"><label>p = <input class="ans" aria-label="Periode p" data-ans="pi" data-wrong="4pi=>Du hast 2π mit 2 multipliziert. Richtig ist: p = 2π : b.|2pi=>2π ist die Periode von sin(x). Der Faktor 2 beim x verändert sie.|2=>Denk an das π: p = 2π : b."></label></div>
+  </div>
+
+  <div class="quiz" data-q="s3-b" data-kind="fields" data-hint="b = 1/2. Durch einen Bruch teilt man, indem man mit dem Kehrwert multipliziert." data-solution="p = 2π : ½ = 2π · 2 = 4π">
+    <p class="q-text">Bestimme die Periode von <span class="m">h(x) = 2 · sin(<span class="fr">1/2</span>x)</span>.</p>
+    <div class="fields"><label>p = <input class="ans" aria-label="Periode p" data-ans="4pi" data-wrong="pi=>Du hast 2π · ½ gerechnet. Teile stattdessen: 2π : ½ = 2π · 2.|2pi=>Die 2 vor dem Sinus ändert nur die Amplitude. Entscheidend für die Periode ist b = ½."></label></div>
+  </div>
+
+  <div class="quiz" data-q="s3-c" data-kind="fields" data-hint="Stelle p = 2π : b nach b um: b = 2π : p." data-solution="b = 2π : 4 = π/2">
+    <p class="q-text">Ein Graph hat die Periode <span class="m">p = 4</span> (ohne π!). Bestimme b.</p>
+    <div class="fields"><label>b = <input class="ans" aria-label="Parameter b" data-ans="pi/2" data-wrong="4=>Das ist die Periode selbst. Gesucht ist b = 2π : p.|8pi=>Du hast 2π · 4 gerechnet. Richtig ist b = 2π : p.|2/pi=>Du hast p : 2π gerechnet. Richtig ist b = 2π : p.|0.25=>Fehlt da das π? b = 2π : 4."></label></div>
+  </div>
+
+  <div class="quiz" data-q="s3-d" data-kind="mc">
+    <p class="q-text">Was passiert mit dem Graphen von <span class="m">y = sin(b · x)</span>, wenn b größer als 1 wird?</p>
+    <div class="mc">
+      <button type="button" data-fb="Umgekehrt: Durch b wird geteilt. Größeres b, kleinere Periode.">Er wird breiter, die Periode wird größer.</button>
+      <button type="button" data-ok data-fb="Richtig. Beispiel: sin(2x) hat die Periode π.">Er wird schmaler, die Periode wird kleiner.</button>
+      <button type="button" data-fb="Die Höhe hängt vom Faktor vor dem Sinus ab, nicht von b.">Er wird höher, die Amplitude wird größer.</button>
+      <button type="button" data-fb="Eine Verschiebung bewirkt der Parameter c. b streckt oder staucht.">Er wird nach rechts verschoben.</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s3-e" data-kind="fields" data-hint="Der Streckfaktor in x-Richtung ist 1 : b." data-solution="Der Graph von h entsteht aus dem Graphen von g durch eine Streckung in x-Richtung mit dem Faktor 1 : ½ = 2.">
+    <p class="q-text">Vervollständige die Beschreibung.</p>
+    <div class="fields cloze">
+      Der Graph von <span class="m">h(x) = 2 · sin(<span class="fr">1/2</span>x)</span> entsteht aus dem Graphen von <span class="m">g(x) = 2 · sin(x)</span> durch eine Streckung in
+      <select class="ans" aria-label="Richtung" data-ans="x"><option value="">…</option><option>x</option><option>y</option></select>-Richtung
+      mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor" data-ans="2" data-wrong="0.5=>Der Faktor der Streckung ist 1 : b = 1 : ½ = 2."></span>.
+    </div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Schieberegler für b:
+        <div class="cmd"><code>b=Schieberegler(0.25, 3, 0.25)</code></div></li>
+      <li>Vergleichsgraph und neue Funktion:
+        <div class="cmd"><code>g(x)=2*sin(x)</code></div>
+        <div class="cmd"><code>h(x)=2*sin(b*x)</code></div></li>
+      <li>Stelle <span class="m">b = 0,5</span> ein und lies die Periode ab. Dann <span class="m">b = 2</span>. Passt das zu <span class="m">p = 2π : b</span>?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 4 -->
+<section class="step" id="s4" data-title="Parameter c: Verschiebung in x-Richtung" hidden>
+  <p class="eyebrow">Schritt 4 von 9</p>
+  <h2>Parameter <span class="m">c</span>: Verschiebung in x-Richtung</h2>
+  <p class="lead">Im Buch: <span class="m">i(x) = 2 · sin(<span class="fr">1/2</span>(x − <span class="fr">π/2</span>))</span>. Der Graph von i ist gegenüber dem Graphen von h um <span class="m"><span class="fr">π/2</span></span> nach <b>rechts</b> verschoben.</p>
+
+  <h3>Warum nach rechts, obwohl dort ein Minus steht?</h3>
+  <p>Setze <span class="m">x = <span class="fr">π/2</span></span> ein: <span class="m">i(<span class="fr">π/2</span>) = 2 · sin(<span class="fr">1/2</span> · 0) = 0</span>. Bei <span class="m">x = <span class="fr">π/2</span></span> passiert bei i also genau das, was bei h an der Stelle 0 passiert. Der Startpunkt wandert von <span class="m">O(0 | 0)</span> nach <span class="m">O'(<span class="fr">π/2</span> | 0)</span>.</p>
+
+  <h3>Ausprobieren</h3>
+  <div class="plot-host" id="p4"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r4c">c</label><input type="range" id="r4c" min="-8" max="8" step="1" value="2"><output id="o4c" for="r4c"></output></div>
+  </div>
+  <div class="readout" id="ro4"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <p>Der Graph von <span class="m">y = sin(b · (x − c))</span> entsteht aus dem Graphen von <span class="m">y = sin(b · x)</span> durch eine <b>Verschiebung in x-Richtung um c</b>.</p>
+    <ul>
+      <li><span class="m">c &gt; 0</span>, also <span class="m">x − …</span> in der Klammer: Verschiebung nach <b>rechts</b>.</li>
+      <li><span class="m">c &lt; 0</span>, also <span class="m">x + …</span> in der Klammer: Verschiebung nach <b>links</b>. Beispiel: <span class="m">x + <span class="fr">π/4</span> = x − (−<span class="fr">π/4</span>)</span>, also <span class="m">c = −<span class="fr">π/4</span></span>.</li>
+    </ul>
+    <p>Der Startpunkt liegt bei <span class="m">x = c</span>.</p>
+  </div>
+
+  <div class="box fehler">
+    <span class="tag">Typischer Fehler</span>
+    <p>Die Verschiebung kannst du nur ablesen, wenn b <b>ausgeklammert</b> ist. Bei <span class="m">sin(2x − π)</span> ist der Graph nicht um π verschoben. Erst ausklammern:</p>
+    <p class="formula">sin(2x − π) = sin(2 · (x − <span class="fr">π/2</span>))</p>
+    <p>Die Verschiebung beträgt also <span class="m"><span class="fr">π/2</span></span> nach rechts.</p>
+  </div>
+
+  <div class="quiz" data-q="s4-a" data-kind="fields" data-hint="In der Klammer steht x minus etwas." data-solution="Verschiebung um π/3 nach rechts (c = π/3).">
+    <p class="q-text">Wie ist der Graph von <span class="m">y = sin(x − <span class="fr">π/3</span>)</span> gegenüber dem Graphen von <span class="m">y = sin(x)</span> verschoben?</p>
+    <div class="fields cloze">
+      Verschiebung um <span class="fld"><input class="ans" aria-label="Verschiebung um" data-ans="pi/3"></span>
+      nach <select class="ans" aria-label="Richtung" data-ans="rechts"><option value="">wählen …</option><option>links</option><option>rechts</option><option>oben</option><option>unten</option></select>.
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s4-b" data-kind="fields" data-hint="Schreibe x + π/4 als x − (−π/4)." data-solution="c = −π/4, also Verschiebung um π/4 nach links.">
+    <p class="q-text">Betrachte <span class="m">y = 2 · sin(0,5(x + <span class="fr">π/4</span>))</span> im Vergleich zu <span class="m">y = 2 · sin(0,5x)</span>.</p>
+    <div class="fields cloze">
+      c = <span class="fld"><input class="ans" aria-label="Parameter c" data-ans="-pi/4" data-wrong="pi/4=>Achte aufs Vorzeichen: x + π/4 = x − (−π/4). Also ist c negativ."></span>;
+      Verschiebung um <span class="fld"><input class="ans" aria-label="Verschiebung um" data-ans="pi/4" data-wrong="-pi/4=>Die Weite einer Verschiebung gibst du positiv an. Die Richtung steht im Auswahlfeld."></span>
+      nach <select class="ans" aria-label="Richtung" data-ans="links"><option value="">wählen …</option><option>links</option><option>rechts</option></select>.
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s4-c" data-kind="mc">
+    <p class="q-text">Um wie viel ist der Graph von <span class="m">y = sin(2x − π)</span> gegenüber dem Graphen von <span class="m">y = sin(2x)</span> verschoben?</p>
+    <div class="mc">
+      <button type="button" data-fb="Erst die 2 ausklammern: 2x − π = 2(x − π/2).">um π nach rechts</button>
+      <button type="button" data-ok data-fb="Richtig. 2x − π = 2(x − π/2), also c = π/2.">um <span class="m"><span class="fr">π/2</span></span> nach rechts</button>
+      <button type="button" data-fb="Der Betrag stimmt, aber x − … bedeutet: nach rechts.">um <span class="m"><span class="fr">π/2</span></span> nach links</button>
+      <button type="button" data-fb="Erst ausklammern, dann auf das Vorzeichen achten.">um π nach links</button>
+    </div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Schieberegler für c (Schrittweite π/4):
+        <div class="cmd"><code>c=Schieberegler(-2pi, 2pi, pi/4)</code></div></li>
+      <li>Vergleichsgraph h und verschobener Graph i:
+        <div class="cmd"><code>h(x)=2*sin(0.5*x)</code></div>
+        <div class="cmd"><code>i(x)=2*sin(0.5*(x-c))</code></div></li>
+      <li>Den Startpunkt sichtbar machen:
+        <div class="cmd"><code>S=(c, 0)</code></div></li>
+      <li>Bewege c. Liegt S immer an einer Stelle, an der i die x-Achse schneidet und steigt?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 5 -->
+<section class="step" id="s5" data-title="Parameter d: Verschiebung in y-Richtung" hidden>
+  <p class="eyebrow">Schritt 5 von 9</p>
+  <h2>Parameter <span class="m">d</span>: Verschiebung in y-Richtung</h2>
+  <p class="lead">Im Buch: <span class="m">j(x) = 2 · sin(<span class="fr">1/2</span>(x − <span class="fr">π/2</span>)) + 1</span>. Zu jedem y-Wert von i wird 1 addiert. Der Graph rutscht um 1 nach oben.</p>
+
+  <div class="plot-host" id="p5"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r5d">d</label><input type="range" id="r5d" min="-6" max="6" step="1" value="2"><output id="o5d" for="r5d"></output></div>
+  </div>
+  <div class="readout" id="ro5"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <p>Der Graph von <span class="m">y = a · sin(b · (x − c)) + d</span> ist gegenüber dem Graphen ohne „+ d“ um <b>d in y-Richtung verschoben</b>: für <span class="m">d &gt; 0</span> nach oben, für <span class="m">d &lt; 0</span> nach unten.</p>
+    <ul>
+      <li>Die Mittellage ist die Gerade <span class="m">y = d</span>.</li>
+      <li>Größter Funktionswert: <span class="m">d + A</span>, kleinster Funktionswert: <span class="m">d − A</span>.</li>
+      <li>Umgekehrt gilt: <span class="m">d = <span class="fr">y<sub>max</sub> + y<sub>min</sub>/2</span></span> und <span class="m">A = <span class="fr">y<sub>max</sub> − y<sub>min</sub>/2</span></span>. Das brauchst du in Schritt 8.</li>
+    </ul>
+  </div>
+
+  <div class="quiz" data-q="s5-a" data-kind="fields" data-hint="Mittellage y = d. Dann A dazu bzw. A abziehen." data-solution="Mittellage y = −2, größter Wert −2 + 3 = 1, kleinster Wert −2 − 3 = −5.">
+    <p class="q-text">Betrachte <span class="m">f(x) = 3 · sin(x) − 2</span>.</p>
+    <div class="fields">
+      <label>Mittellage: y = <input class="ans short" aria-label="Mittellage y" data-ans="-2" data-wrong="2=>Achte auf das Vorzeichen: − 2 heißt d = −2."></label>
+      <label>größter Wert: <input class="ans short" aria-label="größter Funktionswert" data-ans="1" data-wrong="3=>3 ist die Amplitude. Der größte Wert ist d + A.|5=>Du hast 3 + 2 gerechnet. Es ist d + A = −2 + 3."></label>
+      <label>kleinster Wert: <input class="ans short" aria-label="kleinster Funktionswert" data-ans="-5" data-wrong="-3=>−3 ist nicht d − A. Rechne −2 − 3.|-1=>Du hast 2 − 3 gerechnet. Es ist d − A = −2 − 3."></label>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s5-b" data-kind="fields" data-hint="d liegt genau in der Mitte zwischen 5 und 1. A ist die Hälfte des Abstands." data-solution="d = (5 + 1) : 2 = 3 und A = (5 − 1) : 2 = 2.">
+    <p class="q-text">Die Hochpunkte eines Sinusgraphen liegen bei <span class="m">y = 5</span>, die Tiefpunkte bei <span class="m">y = 1</span>. Bestimme d und die Amplitude A.</p>
+    <div class="fields">
+      <label>d = <input class="ans short" aria-label="Parameter d" data-ans="3" data-wrong="2=>Das ist die Amplitude. d liegt in der Mitte: (5 + 1) : 2.|6=>Du hast 5 + 1 gerechnet. Teile noch durch 2."></label>
+      <label>A = <input class="ans short" aria-label="Amplitude A" data-ans="2" data-wrong="4=>4 ist der ganze Abstand von oben nach unten. Die Amplitude ist die Hälfte davon.|3=>3 ist die Mittellage d. Die Amplitude ist (5 − 1) : 2."></label>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s5-c" data-kind="fields" data-hint="Was steht nach dem Sinus-Ausdruck?" data-solution="Verschiebung um 1,5 nach unten.">
+    <p class="q-text">Der Graph von <span class="m">y = 2 · sin(x) − 1,5</span> entsteht aus dem Graphen von <span class="m">y = 2 · sin(x)</span> durch …</p>
+    <div class="fields cloze">
+      eine Verschiebung um <span class="fld"><input class="ans short" aria-label="Verschiebung um" data-ans="1.5" data-wrong="-1.5=>Die Weite gibst du positiv an. Die Richtung steht im Auswahlfeld."></span>
+      nach <select class="ans" aria-label="Richtung" data-ans="unten"><option value="">wählen …</option><option>links</option><option>rechts</option><option>oben</option><option>unten</option></select>.
+    </div>
+  </div>
+
+  <div class="box buch">
+    <span class="tag">Hinweis zum Buch</span>
+    <p>Im Abschnitt „Verschiebung in y-Richtung“ steht „Die Funktion i hat die Amplitude …“. Gemeint ist dort die Funktion j.</p>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Schieberegler für d:
+        <div class="cmd"><code>d=Schieberegler(-3, 3, 0.5)</code></div></li>
+      <li>Funktionen i und j:
+        <div class="cmd"><code>i(x)=2*sin(0.5*(x-pi/2))</code></div>
+        <div class="cmd"><code>j(x)=i(x)+d</code></div></li>
+      <li>Mittellage einzeichnen:
+        <div class="cmd"><code>y=d</code></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 6 -->
+<section class="step" id="s6" data-title="Alles zusammen" hidden>
+  <p class="eyebrow">Schritt 6 von 9</p>
+  <h2>Alles zusammen</h2>
+  <p class="lead">Jetzt kennst du alle vier Parameter. Zusammen ergeben sie die allgemeine Form:</p>
+  <p class="formula">f(x) = a · sin(b · (x − c)) + d</p>
+
+  <div class="tbl-wrap"><table>
+    <tr><th>Parameter</th><th>Wirkung auf den Graphen von sin(x)</th><th>Kenngröße</th></tr>
+    <tr><td><span class="m big">a</span></td><td class="l">Streckung in y-Richtung mit dem Faktor a</td><td class="l">Amplitude <span class="m">A = |a|</span></td></tr>
+    <tr><td><span class="m big">b</span></td><td class="l">Streckung in x-Richtung mit dem Faktor <span class="m"><span class="fr">1/b</span></span></td><td class="l">Periode <span class="m">p = <span class="fr">2π/b</span></span></td></tr>
+    <tr><td><span class="m big">c</span></td><td class="l">Verschiebung um |c| in x-Richtung: c &gt; 0 nach rechts, c &lt; 0 nach links</td><td class="l">Startpunkt bei <span class="m">x = c</span></td></tr>
+    <tr><td><span class="m big">d</span></td><td class="l">Verschiebung um |d| in y-Richtung: d &gt; 0 nach oben, d &lt; 0 nach unten</td><td class="l">Mittellage <span class="m">y = d</span></td></tr>
+  </table></div>
+
+  <div class="box merke">
+    <span class="tag">Merke</span>
+    <p>Der Startpunkt <span class="m">O(0 | 0)</span> von <span class="m">sin(x)</span> wandert nach <span class="m">O'(c | d)</span>. Dort schneidet der Graph die Mittellage und steigt (für <span class="m">a &gt; 0</span>).</p>
+    <p>Zum Skizzieren gehst du in der Reihenfolge <b>a, b, c, d</b> vor: erst strecken, dann verschieben.</p>
+  </div>
+
+  <h3>Spielwiese</h3>
+  <p>Stelle alle vier Parameter ein. Unter dem Graphen erscheint die passende Beschreibung in Worten.</p>
+  <div class="plot-host" id="p6"></div>
+  <div class="ctrls">
+    <div class="ctrl"><label for="r6a">a</label><input type="range" id="r6a" min="-6" max="6" step="1" value="4"><output id="o6a" for="r6a"></output></div>
+    <div class="ctrl"><label for="r6b">b</label><input type="range" id="r6b" min="0" max="4" step="1" value="0"><output id="o6b" for="r6b"></output></div>
+    <div class="ctrl"><label for="r6c">c</label><input type="range" id="r6c" min="-8" max="8" step="1" value="2"><output id="o6c" for="r6c"></output></div>
+    <div class="ctrl"><label for="r6d">d</label><input type="range" id="r6d" min="-6" max="6" step="1" value="2"><output id="o6d" for="r6d"></output></div>
+  </div>
+  <div class="row">
+    <button type="button" class="btn sec small" id="b6reset">Auf sin(x) zurücksetzen</button>
+    <button type="button" class="btn sec small" id="b6j">Funktion j aus dem Buch</button>
+    <button type="button" class="btn sec small" id="b6ex2">Beispiel 2 aus dem Buch</button>
+  </div>
+  <p class="caption">Grau: <span class="m">y = sin(x)</span> zum Vergleich. Gestrichelt: Mittellage. O': Startpunkt. H: Hochpunkt.</p>
+  <div class="readout" id="ro6"></div>
+
+  <div class="box tip">
+    <span class="tag">Formulierungshilfe</span>
+    <p>„Der Graph von f entsteht aus dem Graphen von y = sin(x) durch</p>
+    <ul>
+      <li>eine Streckung in y-Richtung mit dem Faktor …,</li>
+      <li>eine Streckung in x-Richtung mit dem Faktor …,</li>
+      <li>eine Verschiebung um … nach links/rechts und</li>
+      <li>eine Verschiebung um … nach oben/unten.“</li>
+    </ul>
+    <p class="small">Teile, die nichts verändern (z. B. Faktor 1 oder Verschiebung um 0), lässt du weg.</p>
+  </div>
+
+  <div class="quiz" data-q="s6-a" data-kind="mc">
+    <p class="q-text">Welcher Parameter verändert die Periode?</p>
+    <div class="mc">
+      <button type="button" data-fb="a verändert die Amplitude.">a</button>
+      <button type="button" data-ok data-fb="Richtig: p = 2π : b.">b</button>
+      <button type="button" data-fb="c verschiebt den Graphen nur. Die Länge einer Welle bleibt gleich.">c</button>
+      <button type="button" data-fb="d verschiebt den Graphen nach oben oder unten.">d</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s6-b" data-kind="mc">
+    <p class="q-text">Wohin wandert der Startpunkt <span class="m">O(0 | 0)</span> beim Graphen von <span class="m">f(x) = a · sin(b · (x − c)) + d</span>?</p>
+    <div class="mc">
+      <button type="button" data-fb="Die Koordinaten sind vertauscht: c gehört zur x-Richtung.">nach <span class="m">(d | c)</span></button>
+      <button type="button" data-fb="x − c bedeutet eine Verschiebung um +c, also nach rechts für c &gt; 0.">nach <span class="m">(−c | d)</span></button>
+      <button type="button" data-ok data-fb="Richtig. Bei x = c ist die Klammer null, also f(c) = a · sin(0) + d = d.">nach <span class="m">(c | d)</span></button>
+      <button type="button" data-fb="+ d bedeutet nach oben für d &gt; 0.">nach <span class="m">(c | −d)</span></button>
+    </div>
+  </div>
+
+  <div class="quiz" data-q="s6-c" data-kind="fields" data-hint="Lies a, c und d ab. Achte bei c auf das Vorzeichen in der Klammer." data-solution="Streckung in y-Richtung mit dem Faktor 3, Verschiebung um π/2 nach links und um 1 nach unten.">
+    <p class="q-text">Beschreibe den Graphen von <span class="m">f(x) = 3 · sin(x + <span class="fr">π/2</span>) − 1</span>.</p>
+    <div class="fields cloze">
+      Der Graph entsteht aus dem Graphen von <span class="m">sin(x)</span> durch eine Streckung in y-Richtung mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor y-Richtung" data-ans="3"></span>,
+      eine Verschiebung um <span class="fld"><input class="ans" aria-label="Verschiebung in x-Richtung um" data-ans="pi/2"></span>
+      nach <select class="ans" aria-label="Richtung x" data-ans="links"><option value="">wählen …</option><option>links</option><option>rechts</option></select>
+      und eine Verschiebung um <span class="fld"><input class="ans short" aria-label="Verschiebung in y-Richtung um" data-ans="1"></span>
+      nach <select class="ans" aria-label="Richtung y" data-ans="unten"><option value="">wählen …</option><option>oben</option><option>unten</option></select>.
+    </div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra ausprobieren</span>
+    <ol>
+      <li>Vier Schieberegler anlegen (jede Zeile einzeln eingeben):
+        <div class="cmd"><code>a=Schieberegler(-3, 3, 0.5)</code></div>
+        <div class="cmd"><code>b=Schieberegler(0.25, 3, 0.25)</code></div>
+        <div class="cmd"><code>c=Schieberegler(-2pi, 2pi, pi/4)</code></div>
+        <div class="cmd"><code>d=Schieberegler(-3, 3, 0.5)</code></div></li>
+      <li>Allgemeine Funktion, Mittellage und Startpunkt:
+        <div class="cmd"><code>f(x)=a*sin(b*(x-c))+d</code></div>
+        <div class="cmd"><code>y=d</code></div>
+        <div class="cmd"><code>S=(c, d)</code></div></li>
+      <li>Zum Vergleich: <div class="cmd"><code>g(x)=sin(x)</code></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 7 -->
+<section class="step" id="s7" data-title="Graph skizzieren (Beispiel 2)" hidden>
+  <p class="eyebrow">Schritt 7 von 9</p>
+  <h2>Einen Graphen schrittweise skizzieren</h2>
+  <p class="lead">Beispiel 2 im Buch: Skizziere den Graphen von <span class="m">g(x) = 2 · sin(0,5(x + <span class="fr">π/4</span>)) − 1,5</span> schrittweise aus dem Graphen von <span class="m">f(x) = sin(x)</span>.</p>
+
+  <div class="box buch">
+    <span class="tag">Hinweis zum Buch</span>
+    <p>In der Aufgabenstellung im Buch steht die − 1,5 innerhalb der Sinus-Klammer. Gemeint ist, wie in der Lösung, <span class="m">2 · sin(0,5(x + <span class="fr">π/4</span>)) − 1,5</span>: Die − 1,5 steht außerhalb.</p>
+  </div>
+
+  <h3>Musterlösung in vier Teilschritten</h3>
+  <p>Gehe die Teilschritte nacheinander durch und skizziere parallel in deinem Heft.</p>
+  <div id="sv7"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke: Schnell skizzieren mit fünf Punkten</span>
+    <p>Startpunkt <span class="m">O'(c | d) = O'(−<span class="fr">π/4</span> | −1,5)</span>, Periode <span class="m">p = 4π</span>, also Viertelperiode <span class="m">π</span>. Von O' aus jeweils π weitergehen:</p>
+    <div class="tbl-wrap"><table>
+      <tr><th>x</th><td><span class="m">−<span class="fr">π/4</span></span></td><td><span class="m"><span class="fr">3π/4</span></span></td><td><span class="m"><span class="fr">7π/4</span></span></td><td><span class="m"><span class="fr">11π/4</span></span></td><td><span class="m"><span class="fr">15π/4</span></span></td></tr>
+      <tr><th>y</th><td>−1,5</td><td>0,5</td><td>−1,5</td><td>−3,5</td><td>−1,5</td></tr>
+      <tr><th>Punkt</th><td>Mittellage, steigend</td><td>Hochpunkt</td><td>Mittellage, fallend</td><td>Tiefpunkt</td><td>Mittellage, steigend</td></tr>
+    </table></div>
+  </div>
+
+  <h3>Jetzt du, mit Hilfe</h3>
+  <p>Skizziere schrittweise den Graphen von <span class="m">k(x) = 3 · sin(2(x − <span class="fr">π/4</span>)) + 1</span>. Fülle dazu die vier Teilschritte aus.</p>
+
+  <div class="quiz" data-q="s7-k1" data-kind="fields" data-hint="a ist der Faktor vor dem Sinus." data-solution="a = 3: Streckung in y-Richtung mit dem Faktor 3, Amplitude 3.">
+    <p class="q-text"><b>Teilschritt 1 (a):</b></p>
+    <div class="fields cloze">
+      Streckung in <select class="ans" aria-label="Richtung" data-ans="y"><option value="">…</option><option>x</option><option>y</option></select>-Richtung
+      mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor" data-ans="3"></span>, also Amplitude <span class="fld"><input class="ans short" aria-label="Amplitude" data-ans="3"></span>.
+    </div>
+  </div>
+  <div class="quiz" data-q="s7-k2" data-kind="fields" data-hint="b = 2. Streckfaktor 1 : b, Periode 2π : b." data-solution="b = 2: Streckung in x-Richtung mit dem Faktor 1/2 (also 0,5), Periode p = 2π : 2 = π.">
+    <p class="q-text"><b>Teilschritt 2 (b):</b></p>
+    <div class="fields cloze">
+      Streckung in x-Richtung mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor" data-ans="1/2" data-wrong="2=>Der Streckfaktor ist 1 : b = 1 : 2. Der Graph wird schmaler."></span>, also Periode p = <span class="fld"><input class="ans" aria-label="Periode" data-ans="pi" data-wrong="4pi=>p = 2π : b = 2π : 2."></span>.
+    </div>
+  </div>
+  <div class="quiz" data-q="s7-k3" data-kind="fields" data-hint="In der Klammer steht x − π/4." data-solution="c = π/4: Verschiebung um π/4 nach rechts.">
+    <p class="q-text"><b>Teilschritt 3 (c):</b></p>
+    <div class="fields cloze">
+      c = <span class="fld"><input class="ans" aria-label="Parameter c" data-ans="pi/4" data-wrong="-pi/4=>x − π/4 bedeutet c = +π/4."></span>, also Verschiebung um <span class="fld"><input class="ans" aria-label="Verschiebung um" data-ans="pi/4"></span>
+      nach <select class="ans" aria-label="Richtung" data-ans="rechts"><option value="">wählen …</option><option>links</option><option>rechts</option></select>.
+    </div>
+  </div>
+  <div class="quiz" data-q="s7-k4" data-kind="fields" data-hint="+ 1 am Ende." data-solution="d = 1: Verschiebung um 1 nach oben, Mittellage y = 1.">
+    <p class="q-text"><b>Teilschritt 4 (d):</b></p>
+    <div class="fields cloze">
+      Verschiebung um <span class="fld"><input class="ans short" aria-label="Verschiebung um" data-ans="1"></span>
+      nach <select class="ans" aria-label="Richtung" data-ans="oben"><option value="">wählen …</option><option>oben</option><option>unten</option></select>; Mittellage y = <span class="fld"><input class="ans short" aria-label="Mittellage" data-ans="1"></span>.
+    </div>
+  </div>
+  <div class="row"><button type="button" class="btn sec small" id="b7k">Lösungsgraph schrittweise anzeigen</button></div>
+  <div id="sv7k" hidden></div>
+
+  <h3>Jetzt du, ohne Hilfe</h3>
+  <p>Beschreibe, wie der Graph von <span class="m">m(x) = 1,5 · sin(0,5(x − π)) − 1</span> aus dem Graphen von <span class="m">sin(x)</span> entsteht. Skizziere ihn im Heft oder in GeoGebra.</p>
+  <div class="quiz" data-q="s7-m" data-kind="fields" data-hint="Gehe wie oben vor: a, b, c, d." data-solution="Amplitude 1,5; Periode 2π : 0,5 = 4π; Mittellage y = −1.">
+    <p class="q-text">Zuerst die Kenngrößen:</p>
+    <div class="fields">
+      <label>Amplitude A = <input class="ans short" aria-label="Amplitude" data-ans="1.5"></label>
+      <label>Periode p = <input class="ans" aria-label="Periode" data-ans="4pi" data-wrong="pi=>p = 2π : 0,5, nicht 2π · 0,5."></label>
+      <label>Mittellage y = <input class="ans short" aria-label="Mittellage" data-ans="-1"></label>
+    </div>
+  </div>
+  <label for="t7m" class="small"><b>Deine Beschreibung in ganzen Sätzen:</b></label>
+  <textarea id="t7m" placeholder="Der Graph von m entsteht aus dem Graphen von sin(x) durch …"></textarea>
+  <div class="row" style="margin-top:8px">
+    <button type="button" class="btn sec small" id="b7mSol">Mit Musterlösung vergleichen</button>
+    <button type="button" class="btn sec small" id="b7mKi">Rückmeldung vom KI-Tutor holen</button>
+    <button type="button" class="btn sec small" id="b7mGraph">Graph schrittweise anzeigen</button>
+  </div>
+  <div class="box merke" id="sol7m" hidden>
+    <span class="tag">Musterlösung</span>
+    <p>Der Graph von m entsteht aus dem Graphen von <span class="m">y = sin(x)</span> durch eine Streckung in y-Richtung mit dem Faktor 1,5, eine Streckung in x-Richtung mit dem Faktor 2, eine Verschiebung um π nach rechts und eine Verschiebung um 1 nach unten.</p>
+    <p class="small">Kenngrößen: Amplitude 1,5; Periode 4π; Mittellage <span class="m">y = −1</span>; Startpunkt <span class="m">O'(π | −1)</span>.</p>
+  </div>
+  <div id="sv7m" hidden></div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra kontrollieren</span>
+    <ol>
+      <li>Die Teilschritte von Beispiel 2 einzeln eingeben:
+        <div class="cmd"><code>g_1(x)=2*sin(x)</code></div>
+        <div class="cmd"><code>g_2(x)=2*sin(0.5*x)</code></div>
+        <div class="cmd"><code>g_3(x)=2*sin(0.5*(x+pi/4))</code></div>
+        <div class="cmd"><code>g(x)=2*sin(0.5*(x+pi/4))-1.5</code></div></li>
+      <li>Mit einem Klick auf den Kreis links neben einer Zeile blendest du einen Graphen ein oder aus.</li>
+      <li>Für deine eigene Skizze von m:
+        <div class="cmd"><code>m(x)=1.5*sin(0.5*(x-pi))-1</code></div></li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 8 -->
+<section class="step" id="s8" data-title="Gleichung bestimmen (Beispiel 1)" hidden>
+  <p class="eyebrow">Schritt 8 von 9</p>
+  <h2>Die Funktionsgleichung aus dem Graphen bestimmen</h2>
+  <p class="lead">Beispiel 1 im Buch: Gib zum abgebildeten Graphen eine Funktionsgleichung der Form <span class="m">f(x) = a · sin(b · (x − c)) + d</span> an.</p>
+
+  <h3>Musterlösung in fünf Teilschritten</h3>
+  <div class="plot-host" id="p8"></div>
+  <div class="stepper" id="st8" role="group" aria-label="Teilschritte"></div>
+  <div class="stage-text" id="tx8" aria-live="polite"></div>
+
+  <div class="box merke">
+    <span class="tag">Merke: Vorgehen</span>
+    <ol>
+      <li>Größten und kleinsten y-Wert ablesen: <span class="m">y<sub>max</sub></span>, <span class="m">y<sub>min</sub></span>.</li>
+      <li>Mittellage: <span class="m">d = <span class="fr">y<sub>max</sub> + y<sub>min</sub>/2</span></span></li>
+      <li>Amplitude: <span class="m">a = <span class="fr">y<sub>max</sub> − y<sub>min</sub>/2</span></span></li>
+      <li>Periode p als Abstand zweier benachbarter Hochpunkte ablesen, dann <span class="m">b = <span class="fr">2π/p</span></span>.</li>
+      <li>Einen Punkt <span class="m">O'</span> auf der Mittellage suchen, an dem der Graph <b>steigt</b>. Seine x-Koordinate ist c.</li>
+    </ol>
+    <p class="small">Probe: Setze einen abgelesenen Punkt ein, z. B. einen Hochpunkt.</p>
+  </div>
+
+  <div class="box exkurs">
+    <span class="tag">Gut zu wissen</span>
+    <p>c ist nicht eindeutig. Jede Stelle, an der der Graph die Mittellage steigend schneidet, ist erlaubt. Im Beispiel also <span class="m">c = <span class="fr">1/2</span></span>, aber auch <span class="m">c = 4,5</span> oder <span class="m">c = −3,5</span>. Meist nimmt man die Stelle, die am nächsten bei 0 liegt.</p>
+  </div>
+
+  <h3>Training: Gleichungen bestimmen</h3>
+  <p>Hier bekommst du immer neue Graphen. Bestimme a, b, c und d. Wenn du nicht weiterkommst, blende die Hilfen nacheinander ein.</p>
+  <div class="quiz train" data-q="s8-train" data-kind="train">
+    <div class="q-head"><span class="q-num">Training</span><span class="counter" id="tr-count"></span></div>
+    <div class="row" style="margin-bottom:6px">
+      <span class="small">x-Achse:</span>
+      <span class="seg" role="group" aria-label="Achseneinteilung">
+        <button type="button" id="tr-num" aria-pressed="true">in Zahlen</button>
+        <button type="button" id="tr-pi" aria-pressed="false">in π</button>
+      </span>
+      <button type="button" class="btn sec small" id="tr-new">Neue Aufgabe</button>
+    </div>
+    <div class="plot-host" id="p8t"></div>
+    <div class="row">
+      <button type="button" class="btn sec small" id="tr-h1">Hilfe 1: Hoch- und Tiefpunkte</button>
+      <button type="button" class="btn sec small" id="tr-h2" disabled>Hilfe 2: Mittellage</button>
+      <button type="button" class="btn sec small" id="tr-h3" disabled>Hilfe 3: Periode</button>
+      <button type="button" class="btn sec small" id="tr-h4" disabled>Hilfe 4: Startpunkt O'</button>
+    </div>
+    <p class="m wrap big" style="margin:14px 0 6px">f(x) = a · sin(b · (x − c)) + d</p>
+    <div class="fields">
+      <label>a = <input class="ans short" id="tr-a" aria-label="a"></label>
+      <label>b = <input class="ans" id="tr-b" aria-label="b"></label>
+      <label>c = <input class="ans" id="tr-c" aria-label="c"></label>
+      <label>d = <input class="ans short" id="tr-d" aria-label="d"></label>
+    </div>
+    <div class="q-actions">
+      <button type="button" class="btn" id="tr-check">Prüfen</button>
+      <button type="button" class="btn sec" id="tr-overlay">Meinen Graphen einblenden</button>
+      <button type="button" class="btn sec" id="tr-sol">Lösungsweg zeigen</button>
+    </div>
+    <div class="fb" id="tr-fb" aria-live="polite"></div>
+  </div>
+
+  <div class="box gg">
+    <span class="tag">In GeoGebra kontrollieren</span>
+    <ol>
+      <li>Stelle die x-Achse wieder auf normale Zahlen um (Einstellungen, Reiter x-Achse, Haken bei „Abstand“ entfernen).</li>
+      <li>Gib deine Lösung für Beispiel 1 ein:
+        <div class="cmd"><code>f(x)=2*sin(pi/2*(x-0.5))+3</code></div></li>
+      <li>Probe mit einem Punkt: GeoGebra rechnet den Funktionswert aus.
+        <div class="cmd"><code>f(1.5)</code></div></li>
+      <li>Beim Training: Gib deine Werte für a, b, c, d genauso ein und vergleiche den Graphen mit dem Bild in der Anwendung.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ======================================================= SCHRITT 9 -->
+<section class="step" id="s9" data-title="Abschluss-Check" hidden>
+  <p class="eyebrow">Schritt 9 von 9</p>
+  <h2>Abschluss-Check</h2>
+  <p class="lead">Teste, ob du die Ziele erreicht hast. Die Aufgaben sind nach Niveau sortiert. Bearbeite mindestens die Basisinhalte.</p>
+  <div class="summary" id="sum9"></div>
+
+  <div class="level" data-level="basis">
+    <h3>Basisinhalte</h3>
+    <div class="quiz" data-q="s9-b1" data-kind="fields" data-hint="Amplitude: Faktor vor dem Sinus. Periode: 2π : b." data-solution="A = 3, p = 2π : 2 = π">
+      <p class="q-text">Gib Amplitude und Periode von <span class="m">f(x) = 3 · sin(2x)</span> an.</p>
+      <div class="fields">
+        <label>A = <input class="ans short" aria-label="Amplitude" data-ans="3" data-wrong="2=>2 steht beim x. Das beeinflusst die Periode."></label>
+        <label>p = <input class="ans" aria-label="Periode" data-ans="pi" data-wrong="4pi=>p = 2π : b, nicht 2π · b.|3=>Die 3 steht vor dem Sinus und bestimmt die Amplitude."></label>
+      </div>
+    </div>
+    <div class="quiz" data-q="s9-b2" data-kind="mc">
+      <p class="q-text">Wie verändert die − 2 in <span class="m">f(x) = sin(x) − 2</span> den Graphen?</p>
+      <div class="mc">
+        <button type="button" data-fb="Eine Verschiebung nach links stünde in der Klammer: sin(x + 2).">Verschiebung um 2 nach links</button>
+        <button type="button" data-ok data-fb="Richtig. d = −2, die Mittellage ist y = −2.">Verschiebung um 2 nach unten</button>
+        <button type="button" data-fb="− 2 bedeutet nach unten.">Verschiebung um 2 nach oben</button>
+        <button type="button" data-fb="Eine Streckung wäre ein Faktor, also eine Multiplikation.">Streckung in y-Richtung mit dem Faktor 2</button>
+      </div>
+    </div>
+    <div class="quiz" data-q="s9-b3" data-kind="mc">
+      <p class="q-text">Wie ist der Graph von <span class="m">y = sin(x + <span class="fr">π/6</span>)</span> gegenüber dem Graphen von <span class="m">y = sin(x)</span> verschoben?</p>
+      <div class="mc">
+        <button type="button" data-fb="x + … bedeutet c &lt; 0, also nach links.">um <span class="m"><span class="fr">π/6</span></span> nach rechts</button>
+        <button type="button" data-fb="Was in der Klammer steht, wirkt in x-Richtung.">um <span class="m"><span class="fr">π/6</span></span> nach oben</button>
+        <button type="button" data-ok data-fb="Richtig. x + π/6 = x − (−π/6), also c = −π/6.">um <span class="m"><span class="fr">π/6</span></span> nach links</button>
+      </div>
+    </div>
+    <div class="quiz" data-q="s9-b4" data-kind="fields" data-hint="b = 2π : p" data-solution="b = 2π : 6π = 1/3">
+      <p class="q-text">Ein Sinusgraph hat die Periode <span class="m">p = 6π</span>. Bestimme b.</p>
+      <div class="fields"><label>b = <input class="ans" aria-label="b" data-ans="1/3" data-wrong="3=>Umgekehrt: b = 2π : p = 2π : 6π.|6pi=>Das ist die Periode selbst."></label></div>
+    </div>
+  </div>
+
+  <div class="level" data-level="erweitert">
+    <h3>Erweiterte Basisinhalte</h3>
+    <div class="quiz" data-q="s9-e1" data-kind="fields" data-hint="Geh die Parameter der Reihe nach durch: a = 0,5; b = 3; c: Vorzeichen beachten; d = 1." data-solution="Streckung in y-Richtung mit Faktor 0,5; Streckung in x-Richtung mit Faktor 1/3; Verschiebung um π/6 nach links; Verschiebung um 1 nach oben. Periode 2π/3.">
+      <p class="q-text">Beschreibe den Graphen von <span class="m">g(x) = 0,5 · sin(3(x + <span class="fr">π/6</span>)) + 1</span>.</p>
+      <div class="fields cloze">
+        Der Graph von g entsteht aus dem Graphen von <span class="m">sin(x)</span> durch eine Streckung in y-Richtung mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor y-Richtung" data-ans="0.5"></span>,
+        eine Streckung in x-Richtung mit dem Faktor <span class="fld"><input class="ans short" aria-label="Faktor x-Richtung" data-ans="1/3" data-wrong="3=>Der Streckfaktor in x-Richtung ist 1 : b."></span>,
+        eine Verschiebung um <span class="fld"><input class="ans" aria-label="Verschiebung x um" data-ans="pi/6"></span>
+        nach <select class="ans" aria-label="Richtung x" data-ans="links"><option value="">wählen …</option><option>links</option><option>rechts</option></select>
+        und eine Verschiebung um <span class="fld"><input class="ans short" aria-label="Verschiebung y um" data-ans="1"></span>
+        nach <select class="ans" aria-label="Richtung y" data-ans="oben"><option value="">wählen …</option><option>oben</option><option>unten</option></select>.
+        Die Periode beträgt p = <span class="fld"><input class="ans" aria-label="Periode" data-ans="2pi/3" data-wrong="6pi=>p = 2π : 3, nicht 2π · 3."></span>.
+      </div>
+    </div>
+
+    <div class="quiz" data-q="s9-e2" data-kind="params" data-target="1.5|2|pi/4|1" data-xr="-1.9|7.1" data-hint="Gehe vor wie in Schritt 8: y_max, y_min, d, a, Periode, Startpunkt." data-solution="y_max = 2,5 und y_min = −0,5, also d = 1 und a = 1,5. Hochpunkte bei π/2 und 3π/2, also p = π und b = 2. Steigender Schnitt mit der Mittellage bei x = π/4, also c = π/4. f(x) = 1,5 · sin(2(x − π/4)) + 1.">
+      <p class="q-text">Bestimme eine Funktionsgleichung zum abgebildeten Graphen.</p>
+      <div class="plot-host" id="p9e2"></div>
+      <div class="fields">
+        <label>a = <input class="ans short" aria-label="a" data-p="a"></label>
+        <label>b = <input class="ans" aria-label="b" data-p="b"></label>
+        <label>c = <input class="ans" aria-label="c" data-p="c"></label>
+        <label>d = <input class="ans short" aria-label="d" data-p="d"></label>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="s9-e3" data-kind="mc">
+      <p class="q-text">Welcher Graph gehört zu <span class="m">f(x) = 2 · sin(x + <span class="fr">π/2</span>)</span>?</p>
+      <div class="mc graphs">
+        <button type="button" data-fb="Hier ist der Graph nach rechts verschoben. x + π/2 bedeutet aber: nach links." aria-label="Graph A"><div class="plot-host" id="p9e3a"></div>Graph A</button>
+        <button type="button" data-ok data-fb="Richtig. Amplitude 2, Startpunkt bei x = −π/2." aria-label="Graph B"><div class="plot-host" id="p9e3b"></div>Graph B</button>
+        <button type="button" data-fb="Die Verschiebung stimmt, aber die Amplitude ist 1 statt 2." aria-label="Graph C"><div class="plot-host" id="p9e3c"></div>Graph C</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="level" data-level="fortgeschritten">
+    <h3>Fortgeschrittene Inhalte</h3>
+    <div class="quiz" data-q="s9-f1" data-kind="mc">
+      <p class="q-text">Wie ist der Graph von <span class="m">y = sin(2x − <span class="fr">π/2</span>)</span> gegenüber dem Graphen von <span class="m">y = sin(2x)</span> verschoben?</p>
+      <div class="mc">
+        <button type="button" data-fb="Erst die 2 ausklammern: 2x − π/2 = 2(x − π/4).">um <span class="m"><span class="fr">π/2</span></span> nach rechts</button>
+        <button type="button" data-ok data-fb="Richtig. 2x − π/2 = 2(x − π/4), also c = π/4.">um <span class="m"><span class="fr">π/4</span></span> nach rechts</button>
+        <button type="button" data-fb="Der Betrag stimmt. Aber x − … bedeutet nach rechts.">um <span class="m"><span class="fr">π/4</span></span> nach links</button>
+        <button type="button" data-fb="Erst ausklammern, dann auf das Vorzeichen achten.">um <span class="m"><span class="fr">π/2</span></span> nach links</button>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="s9-f2" data-kind="params" data-target="2|1|pi/2|2" data-xr="-3.2|9.5" data-hint="Zwischen Hochpunkt und dem nächsten Tiefpunkt liegt eine halbe Periode. Der Startpunkt liegt eine Viertelperiode links vom Hochpunkt." data-solution="d = (4 + 0) : 2 = 2, a = (4 − 0) : 2 = 2. Halbe Periode: 2π − π = π, also p = 2π und b = 1. Startpunkt eine Viertelperiode vor dem Hochpunkt: c = π − π/2 = π/2. f(x) = 2 · sin(x − π/2) + 2.">
+      <p class="q-text">Ein Sinusgraph hat den Hochpunkt <span class="m">H(π | 4)</span>. Der nächste Tiefpunkt rechts davon ist <span class="m">T(2π | 0)</span>. Bestimme eine passende Funktionsgleichung.</p>
+      <div class="fields">
+        <label>a = <input class="ans short" aria-label="a" data-p="a"></label>
+        <label>b = <input class="ans" aria-label="b" data-p="b"></label>
+        <label>c = <input class="ans" aria-label="c" data-p="c"></label>
+        <label>d = <input class="ans short" aria-label="d" data-p="d"></label>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="s9-f3" data-kind="mc">
+      <p class="q-text">In Beispiel 1 gilt <span class="m">c = <span class="fr">1/2</span></span> (mit <span class="m">a = 2</span>, <span class="m">b = <span class="fr">π/2</span></span>, <span class="m">d = 3</span>). Welcher Wert ist ebenfalls ein gültiges c?</p>
+      <div class="mc">
+        <button type="button" data-fb="Bei x = 2,5 liegt der Graph zwar auf der Mittellage, aber er fällt dort.">c = 2,5</button>
+        <button type="button" data-fb="Bei x = 1,5 liegt ein Hochpunkt, nicht der Startpunkt.">c = 1,5</button>
+        <button type="button" data-ok data-fb="Richtig. 4,5 = ½ + 4, also eine Periode weiter rechts.">c = 4,5</button>
+        <button type="button" data-fb="Bei x = −½ liegt ein Tiefpunkt.">c = −0,5</button>
+      </div>
+    </div>
+
+    <div class="quiz" data-q="s9-f4" data-kind="mc">
+      <p class="q-text">Auch <span class="m">f(x) = −2 · sin(<span class="fr">π/2</span> · (x − 2,5)) + 3</span> beschreibt den Graphen aus Beispiel 1. Warum?</p>
+      <div class="mc">
+        <button type="button" data-fb="Doch: −2 · sin(π/2 · (x − ½)) + 3 wäre ein anderer Graph. Es kommt auf das Zusammenspiel mit c an.">Weil das Vorzeichen von a keine Rolle spielt.</button>
+        <button type="button" data-ok data-fb="Richtig. Bei x = 2,5 fällt der Graph. Ein negatives a passt genau zu so einer Stelle.">Die Spiegelung durch a = −2 und die Verschiebung um eine halbe Periode (von ½ nach 2,5) heben sich gegenseitig auf.</button>
+        <button type="button" data-fb="Das stimmt zwar, reicht aber nicht als Begründung: Bei x = 2,5 fällt der Graph, bei x = ½ steigt er.">Weil der Graph bei x = 2,5 und bei x = ½ auf der Mittellage liegt.</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="box merke" id="done9">
+    <span class="tag">Geschafft?</span>
+    <p>Wenn du die Basisinhalte sicher lösen kannst, kannst du Graphen skizzieren und Transformationen beschreiben. Mit den erweiterten und fortgeschrittenen Aufgaben bist du gut auf Klausuraufgaben vorbereitet.</p>
+    <p class="small">Fehler gemacht? Geh zurück zum passenden Schritt oder frag den KI-Tutor nach einer ähnlichen Übungsaufgabe.</p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<div class="qr-modal" id="qr-modal" hidden role="dialog" aria-modal="true" aria-labelledby="qr-h">
+  <h2 id="qr-h">Sinusfunktionen transformieren</h2>
+  <p class="muted" id="qr-hint" style="margin:0">Scanne den Code mit der Kamera deines Geräts.</p>
+  <div class="qr-box" id="qr-box"></div>
+  <p class="qr-url" id="qr-url"></p>
+  <div class="row" style="justify-content:center">
+    <button type="button" class="btn sec" id="qr-copy">Link kopieren</button>
+    <button type="button" class="btn" id="qr-close">Schließen</button>
+  </div>
+</div>
+
+<!-- ======================================================= KI-TUTOR -->
+<button type="button" class="ki-fab" id="ki-fab" aria-controls="ki-drawer" aria-expanded="false">
+  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 9.5h8M8 12.5h5"/></svg>
+  KI-Tutor fragen
+</button>
+<div class="backdrop" id="ki-backdrop" hidden></div>
+<aside class="ki-drawer" id="ki-drawer" hidden role="dialog" aria-modal="true" aria-labelledby="ki-h">
+  <div class="ki-head">
+    <h2 id="ki-h">Frage an den KI-Tutor</h2>
+    <button type="button" class="x-btn" id="ki-close" aria-label="Schließen">×</button>
+  </div>
+  <p class="ki-step" id="ki-step"></p>
+  <div class="ki-ctx" id="ki-ctx" hidden>
+    <p><b>Bezug zur Aufgabe:</b> <span id="ki-ctx-text"></span></p>
+    <button type="button" class="linkbtn" id="ki-ctx-clear">Bezug entfernen</button>
+  </div>
+  <label for="ki-frage"><b>Deine Frage</b></label>
+  <div class="chips" id="ki-chips">
+    <button type="button">Ich verstehe nicht, warum meine Antwort falsch ist.</button>
+    <button type="button">Kannst du mir einen Tipp geben, ohne die Lösung zu verraten?</button>
+    <button type="button">Kannst du mir das an einem anderen Beispiel erklären?</button>
+    <button type="button">Gib mir eine ähnliche Übungsaufgabe.</button>
+  </div>
+  <textarea id="ki-frage" placeholder="Schreib hier, was du wissen möchtest …"></textarea>
+  <p class="small muted" style="margin:10px 0 0">Diese Nachricht wird kopiert:</p>
+  <div class="ki-preview" id="ki-preview"></div>
+  <div class="ki-actions">
+    <a class="btn" id="ki-go" href="#" target="_blank" rel="noopener" hidden>Kopieren und KI-Tutor öffnen</a>
+    <button type="button" class="btn" id="ki-copy">Nachricht kopieren</button>
+  </div>
+  <div class="ki-note" id="ki-note"></div>
+</aside>
+
+<script>
+/* QR Code Generator for JavaScript, Copyright (c) 2009 Kazuhiko Arase, MIT License (http://www.opensource.org/licenses/mit-license.php). "QR Code" is a registered trademark of DENSO WAVE INCORPORATED. */
+var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],f={},c=function(t,r){o=function(t){for(var r=new Array(t),e=0;e<t;e+=1){r[e]=new Array(t);for(var n=0;n<t;n+=1)r[e][n]=null}return r}(i=4*e+17),l(0,0),l(i-7,0),l(0,i-7),s(),h(),d(t,r),e>=7&&v(t),null==a&&(a=p(e,n,u)),w(a,r)},l=function(t,r){for(var e=-1;e<=7;e+=1)if(!(t+e<=-1||i<=t+e))for(var n=-1;n<=7;n+=1)r+n<=-1||i<=r+n||(o[t+e][r+n]=0<=e&&e<=6&&(0==n||6==n)||0<=n&&n<=6&&(0==e||6==e)||2<=e&&e<=4&&2<=n&&n<=4)},h=function(){for(var t=8;t<i-8;t+=1)null==o[t][6]&&(o[t][6]=t%2==0);for(var r=8;r<i-8;r+=1)null==o[6][r]&&(o[6][r]=r%2==0)},s=function(){for(var t=B.getPatternPosition(e),r=0;r<t.length;r+=1)for(var n=0;n<t.length;n+=1){var i=t[r],a=t[n];if(null==o[i][a])for(var u=-2;u<=2;u+=1)for(var f=-2;f<=2;f+=1)o[i+u][a+f]=-2==u||2==u||-2==f||2==f||0==u&&0==f}},v=function(t){for(var r=B.getBCHTypeNumber(e),n=0;n<18;n+=1){var a=!t&&1==(r>>n&1);o[Math.floor(n/3)][n%3+i-8-3]=a}for(n=0;n<18;n+=1){a=!t&&1==(r>>n&1);o[n%3+i-8-3][Math.floor(n/3)]=a}},d=function(t,r){for(var e=n<<3|r,a=B.getBCHTypeInfo(e),u=0;u<15;u+=1){var f=!t&&1==(a>>u&1);u<6?o[u][8]=f:u<8?o[u+1][8]=f:o[i-15+u][8]=f}for(u=0;u<15;u+=1){f=!t&&1==(a>>u&1);u<8?o[8][i-u-1]=f:u<9?o[8][15-u-1+1]=f:o[8][15-u-1]=f}o[i-8][8]=!t},w=function(t,r){for(var e=-1,n=i-1,a=7,u=0,f=B.getMaskFunction(r),c=i-1;c>0;c-=2)for(6==c&&(c-=1);;){for(var g=0;g<2;g+=1)if(null==o[n][c-g]){var l=!1;u<t.length&&(l=1==(t[u]>>>a&1)),f(n,c-g)&&(l=!l),o[n][c-g]=l,-1==(a-=1)&&(u+=1,a=7)}if((n+=e)<0||i<=n){n-=e,e=-e;break}}},p=function(t,r,e){for(var n=A.getRSBlocks(t,r),o=b(),i=0;i<e.length;i+=1){var a=e[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var u=0;for(i=0;i<n.length;i+=1)u+=n[i].dataCount;if(o.getLengthInBits()>8*u)throw"code length overflow. ("+o.getLengthInBits()+">"+8*u+")";for(o.getLengthInBits()+4<=8*u&&o.put(0,4);o.getLengthInBits()%8!=0;)o.putBit(!1);for(;!(o.getLengthInBits()>=8*u||(o.put(236,8),o.getLengthInBits()>=8*u));)o.put(17,8);return function(t,r){for(var e=0,n=0,o=0,i=new Array(r.length),a=new Array(r.length),u=0;u<r.length;u+=1){var f=r[u].dataCount,c=r[u].totalCount-f;n=Math.max(n,f),o=Math.max(o,c),i[u]=new Array(f);for(var g=0;g<i[u].length;g+=1)i[u][g]=255&t.getBuffer()[g+e];e+=f;var l=B.getErrorCorrectPolynomial(c),h=k(i[u],l.getLength()-1).mod(l);for(a[u]=new Array(l.getLength()-1),g=0;g<a[u].length;g+=1){var s=g+h.getLength()-a[u].length;a[u][g]=s>=0?h.getAt(s):0}}var v=0;for(g=0;g<r.length;g+=1)v+=r[g].totalCount;var d=new Array(v),w=0;for(g=0;g<n;g+=1)for(u=0;u<r.length;u+=1)g<i[u].length&&(d[w]=i[u][g],w+=1);for(g=0;g<o;g+=1)for(u=0;u<r.length;u+=1)g<a[u].length&&(d[w]=a[u][g],w+=1);return d}(o,n)};f.addData=function(t,r){var e=null;switch(r=r||"Byte"){case"Numeric":e=M(t);break;case"Alphanumeric":e=x(t);break;case"Byte":e=m(t);break;case"Kanji":e=L(t);break;default:throw"mode:"+r}u.push(e),a=null},f.isDark=function(t,r){if(t<0||i<=t||r<0||i<=r)throw t+","+r;return o[t][r]},f.getModuleCount=function(){return i},f.make=function(){if(e<1){for(var t=1;t<40;t++){for(var r=A.getRSBlocks(t,n),o=b(),i=0;i<u.length;i++){var a=u[i];o.put(a.getMode(),4),o.put(a.getLength(),B.getLengthInBits(a.getMode(),t)),a.write(o)}var g=0;for(i=0;i<r.length;i++)g+=r[i].dataCount;if(o.getLengthInBits()<=8*g)break}e=t}c(!1,function(){for(var t=0,r=0,e=0;e<8;e+=1){c(!0,e);var n=B.getLostPoint(f);(0==e||t>n)&&(t=n,r=e)}return r}())},f.createTableTag=function(t,r){t=t||2;var e="";e+='<table style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: "+(r=void 0===r?4*t:r)+"px;",e+='">',e+="<tbody>";for(var n=0;n<f.getModuleCount();n+=1){e+="<tr>";for(var o=0;o<f.getModuleCount();o+=1)e+='<td style="',e+=" border-width: 0px; border-style: none;",e+=" border-collapse: collapse;",e+=" padding: 0px; margin: 0px;",e+=" width: "+t+"px;",e+=" height: "+t+"px;",e+=" background-color: ",e+=f.isDark(n,o)?"#000000":"#ffffff",e+=";",e+='"/>';e+="</tr>"}return e+="</tbody>",e+="</table>"},f.createSvgTag=function(t,r,e,n){var o={};"object"==typeof arguments[0]&&(t=(o=arguments[0]).cellSize,r=o.margin,e=o.alt,n=o.title),t=t||2,r=void 0===r?4*t:r,(e="string"==typeof e?{text:e}:e||{}).text=e.text||null,e.id=e.text?e.id||"qrcode-description":null,(n="string"==typeof n?{text:n}:n||{}).text=n.text||null,n.id=n.text?n.id||"qrcode-title":null;var i,a,u,c,g=f.getModuleCount()*t+2*r,l="";for(c="l"+t+",0 0,"+t+" -"+t+",0 0,-"+t+"z ",l+='<svg version="1.1" xmlns="http://www.w3.org/2000/svg"',l+=o.scalable?"":' width="'+g+'px" height="'+g+'px"',l+=' viewBox="0 0 '+g+" "+g+'" ',l+=' preserveAspectRatio="xMinYMin meet"',l+=n.text||e.text?' role="img" aria-labelledby="'+y([n.id,e.id].join(" ").trim())+'"':"",l+=">",l+=n.text?'<title id="'+y(n.id)+'">'+y(n.text)+"</title>":"",l+=e.text?'<description id="'+y(e.id)+'">'+y(e.text)+"</description>":"",l+='<rect width="100%" height="100%" fill="white" cx="0" cy="0"/>',l+='<path d="',a=0;a<f.getModuleCount();a+=1)for(u=a*t+r,i=0;i<f.getModuleCount();i+=1)f.isDark(a,i)&&(l+="M"+(i*t+r)+","+u+c);return l+='" stroke="transparent" fill="black"/>',l+="</svg>"},f.createDataURL=function(t,r){t=t||2,r=void 0===r?4*t:r;var e=f.getModuleCount()*t+2*r,n=r,o=e-r;return I(e,e,(function(r,e){if(n<=r&&r<o&&n<=e&&e<o){var i=Math.floor((r-n)/t),a=Math.floor((e-n)/t);return f.isDark(a,i)?0:1}return 1}))},f.createImgTag=function(t,r,e){t=t||2,r=void 0===r?4*t:r;var n=f.getModuleCount()*t+2*r,o="";return o+="<img",o+=' src="',o+=f.createDataURL(t,r),o+='"',o+=' width="',o+=n,o+='"',o+=' height="',o+=n,o+='"',e&&(o+=' alt="',o+=y(e),o+='"'),o+="/>"};var y=function(t){for(var r="",e=0;e<t.length;e+=1){var n=t.charAt(e);switch(n){case"<":r+="&lt;";break;case">":r+="&gt;";break;case"&":r+="&amp;";break;case'"':r+="&quot;";break;default:r+=n}}return r};return f.createASCII=function(t,r){if((t=t||1)<2)return function(t){t=void 0===t?2:t;var r,e,n,o,i,a=1*f.getModuleCount()+2*t,u=t,c=a-t,g={"██":"█","█ ":"▀"," █":"▄","  ":" "},l={"██":"▀","█ ":"▀"," █":" ","  ":" "},h="";for(r=0;r<a;r+=2){for(n=Math.floor((r-u)/1),o=Math.floor((r+1-u)/1),e=0;e<a;e+=1)i="█",u<=e&&e<c&&u<=r&&r<c&&f.isDark(n,Math.floor((e-u)/1))&&(i=" "),u<=e&&e<c&&u<=r+1&&r+1<c&&f.isDark(o,Math.floor((e-u)/1))?i+=" ":i+="█",h+=t<1&&r+1>=c?l[i]:g[i];h+="\n"}return a%2&&t>0?h.substring(0,h.length-a-1)+Array(a+1).join("▀"):h.substring(0,h.length-1)}(r);t-=1,r=void 0===r?2*t:r;var e,n,o,i,a=f.getModuleCount()*t+2*r,u=r,c=a-r,g=Array(t+1).join("██"),l=Array(t+1).join("  "),h="",s="";for(e=0;e<a;e+=1){for(o=Math.floor((e-u)/t),s="",n=0;n<a;n+=1)i=1,u<=n&&n<c&&u<=e&&e<c&&f.isDark(o,Math.floor((n-u)/t))&&(i=0),s+=i?g:l;for(o=0;o<t;o+=1)h+=s+"\n"}return h.substring(0,h.length-1)},f.renderTo2dContext=function(t,r){r=r||2;for(var e=f.getModuleCount(),n=0;n<e;n++)for(var o=0;o<e;o++)t.fillStyle=f.isDark(n,o)?"black":"white",t.fillRect(n*r,o*r,r,r)},f};t.stringToBytes=(t.stringToBytesFuncs={default:function(t){for(var r=[],e=0;e<t.length;e+=1){var n=t.charCodeAt(e);r.push(255&n)}return r}}).default,t.createStringToBytes=function(t,r){var e=function(){for(var e=S(t),n=function(){var t=e.read();if(-1==t)throw"eof";return t},o=0,i={};;){var a=e.read();if(-1==a)break;var u=n(),f=n()<<8|n();i[String.fromCharCode(a<<8|u)]=f,o+=1}if(o!=r)throw o+" != "+r;return i}(),n="?".charCodeAt(0);return function(t){for(var r=[],o=0;o<t.length;o+=1){var i=t.charCodeAt(o);if(i<128)r.push(i);else{var a=e[t.charAt(o)];"number"==typeof a?(255&a)==a?r.push(a):(r.push(a>>>8),r.push(255&a)):r.push(n)}}return r}};var r,e,n,o,i,a=1,u=2,f=4,c=8,g={L:1,M:0,Q:3,H:2},l=0,h=1,s=2,v=3,d=4,w=5,p=6,y=7,B=(r=[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],e=1335,n=7973,i=function(t){for(var r=0;0!=t;)r+=1,t>>>=1;return r},(o={}).getBCHTypeInfo=function(t){for(var r=t<<10;i(r)-i(e)>=0;)r^=e<<i(r)-i(e);return 21522^(t<<10|r)},o.getBCHTypeNumber=function(t){for(var r=t<<12;i(r)-i(n)>=0;)r^=n<<i(r)-i(n);return t<<12|r},o.getPatternPosition=function(t){return r[t-1]},o.getMaskFunction=function(t){switch(t){case l:return function(t,r){return(t+r)%2==0};case h:return function(t,r){return t%2==0};case s:return function(t,r){return r%3==0};case v:return function(t,r){return(t+r)%3==0};case d:return function(t,r){return(Math.floor(t/2)+Math.floor(r/3))%2==0};case w:return function(t,r){return t*r%2+t*r%3==0};case p:return function(t,r){return(t*r%2+t*r%3)%2==0};case y:return function(t,r){return(t*r%3+(t+r)%2)%2==0};default:throw"bad maskPattern:"+t}},o.getErrorCorrectPolynomial=function(t){for(var r=k([1],0),e=0;e<t;e+=1)r=r.multiply(k([1,C.gexp(e)],0));return r},o.getLengthInBits=function(t,r){if(1<=r&&r<10)switch(t){case a:return 10;case u:return 9;case f:case c:return 8;default:throw"mode:"+t}else if(r<27)switch(t){case a:return 12;case u:return 11;case f:return 16;case c:return 10;default:throw"mode:"+t}else{if(!(r<41))throw"type:"+r;switch(t){case a:return 14;case u:return 13;case f:return 16;case c:return 12;default:throw"mode:"+t}}},o.getLostPoint=function(t){for(var r=t.getModuleCount(),e=0,n=0;n<r;n+=1)for(var o=0;o<r;o+=1){for(var i=0,a=t.isDark(n,o),u=-1;u<=1;u+=1)if(!(n+u<0||r<=n+u))for(var f=-1;f<=1;f+=1)o+f<0||r<=o+f||0==u&&0==f||a==t.isDark(n+u,o+f)&&(i+=1);i>5&&(e+=3+i-5)}for(n=0;n<r-1;n+=1)for(o=0;o<r-1;o+=1){var c=0;t.isDark(n,o)&&(c+=1),t.isDark(n+1,o)&&(c+=1),t.isDark(n,o+1)&&(c+=1),t.isDark(n+1,o+1)&&(c+=1),0!=c&&4!=c||(e+=3)}for(n=0;n<r;n+=1)for(o=0;o<r-6;o+=1)t.isDark(n,o)&&!t.isDark(n,o+1)&&t.isDark(n,o+2)&&t.isDark(n,o+3)&&t.isDark(n,o+4)&&!t.isDark(n,o+5)&&t.isDark(n,o+6)&&(e+=40);for(o=0;o<r;o+=1)for(n=0;n<r-6;n+=1)t.isDark(n,o)&&!t.isDark(n+1,o)&&t.isDark(n+2,o)&&t.isDark(n+3,o)&&t.isDark(n+4,o)&&!t.isDark(n+5,o)&&t.isDark(n+6,o)&&(e+=40);var g=0;for(o=0;o<r;o+=1)for(n=0;n<r;n+=1)t.isDark(n,o)&&(g+=1);return e+=Math.abs(100*g/r/r-50)/5*10},o),C=function(){for(var t=new Array(256),r=new Array(256),e=0;e<8;e+=1)t[e]=1<<e;for(e=8;e<256;e+=1)t[e]=t[e-4]^t[e-5]^t[e-6]^t[e-8];for(e=0;e<255;e+=1)r[t[e]]=e;var n={glog:function(t){if(t<1)throw"glog("+t+")";return r[t]},gexp:function(r){for(;r<0;)r+=255;for(;r>=256;)r-=255;return t[r]}};return n}();function k(t,r){if(void 0===t.length)throw t.length+"/"+r;var e=function(){for(var e=0;e<t.length&&0==t[e];)e+=1;for(var n=new Array(t.length-e+r),o=0;o<t.length-e;o+=1)n[o]=t[o+e];return n}(),n={getAt:function(t){return e[t]},getLength:function(){return e.length},multiply:function(t){for(var r=new Array(n.getLength()+t.getLength()-1),e=0;e<n.getLength();e+=1)for(var o=0;o<t.getLength();o+=1)r[e+o]^=C.gexp(C.glog(n.getAt(e))+C.glog(t.getAt(o)));return k(r,0)},mod:function(t){if(n.getLength()-t.getLength()<0)return n;for(var r=C.glog(n.getAt(0))-C.glog(t.getAt(0)),e=new Array(n.getLength()),o=0;o<n.getLength();o+=1)e[o]=n.getAt(o);for(o=0;o<t.getLength();o+=1)e[o]^=C.gexp(C.glog(t.getAt(o))+r);return k(e,0).mod(t)}};return n}var A=function(){var t=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12,7,37,13],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],r=function(t,r){var e={};return e.totalCount=t,e.dataCount=r,e},e={};return e.getRSBlocks=function(e,n){var o=function(r,e){switch(e){case g.L:return t[4*(r-1)+0];case g.M:return t[4*(r-1)+1];case g.Q:return t[4*(r-1)+2];case g.H:return t[4*(r-1)+3];default:return}}(e,n);if(void 0===o)throw"bad rs block @ typeNumber:"+e+"/errorCorrectionLevel:"+n;for(var i=o.length/3,a=[],u=0;u<i;u+=1)for(var f=o[3*u+0],c=o[3*u+1],l=o[3*u+2],h=0;h<f;h+=1)a.push(r(c,l));return a},e}(),b=function(){var t=[],r=0,e={getBuffer:function(){return t},getAt:function(r){var e=Math.floor(r/8);return 1==(t[e]>>>7-r%8&1)},put:function(t,r){for(var n=0;n<r;n+=1)e.putBit(1==(t>>>r-n-1&1))},getLengthInBits:function(){return r},putBit:function(e){var n=Math.floor(r/8);t.length<=n&&t.push(0),e&&(t[n]|=128>>>r%8),r+=1}};return e},M=function(t){var r=a,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+2<r.length;)t.put(o(r.substring(n,n+3)),10),n+=3;n<r.length&&(r.length-n==1?t.put(o(r.substring(n,n+1)),4):r.length-n==2&&t.put(o(r.substring(n,n+2)),7))}},o=function(t){for(var r=0,e=0;e<t.length;e+=1)r=10*r+i(t.charAt(e));return r},i=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);throw"illegal char :"+t};return n},x=function(t){var r=u,e=t,n={getMode:function(){return r},getLength:function(t){return e.length},write:function(t){for(var r=e,n=0;n+1<r.length;)t.put(45*o(r.charAt(n))+o(r.charAt(n+1)),11),n+=2;n<r.length&&t.put(o(r.charAt(n)),6)}},o=function(t){if("0"<=t&&t<="9")return t.charCodeAt(0)-"0".charCodeAt(0);if("A"<=t&&t<="Z")return t.charCodeAt(0)-"A".charCodeAt(0)+10;switch(t){case" ":return 36;case"$":return 37;case"%":return 38;case"*":return 39;case"+":return 40;case"-":return 41;case".":return 42;case"/":return 43;case":":return 44;default:throw"illegal char :"+t}};return n},m=function(r){var e=f,n=t.stringToBytes(r),o={getMode:function(){return e},getLength:function(t){return n.length},write:function(t){for(var r=0;r<n.length;r+=1)t.put(n[r],8)}};return o},L=function(r){var e=c,n=t.stringToBytesFuncs.SJIS;if(!n)throw"sjis not supported.";!function(t,r){var e=n("友");if(2!=e.length||38726!=(e[0]<<8|e[1]))throw"sjis not supported."}();var o=n(r),i={getMode:function(){return e},getLength:function(t){return~~(o.length/2)},write:function(t){for(var r=o,e=0;e+1<r.length;){var n=(255&r[e])<<8|255&r[e+1];if(33088<=n&&n<=40956)n-=33088;else{if(!(57408<=n&&n<=60351))throw"illegal char at "+(e+1)+"/"+n;n-=49472}n=192*(n>>>8&255)+(255&n),t.put(n,13),e+=2}if(e<r.length)throw"illegal char at "+(e+1)}};return i},D=function(){var t=[],r={writeByte:function(r){t.push(255&r)},writeShort:function(t){r.writeByte(t),r.writeByte(t>>>8)},writeBytes:function(t,e,n){e=e||0,n=n||t.length;for(var o=0;o<n;o+=1)r.writeByte(t[o+e])},writeString:function(t){for(var e=0;e<t.length;e+=1)r.writeByte(t.charCodeAt(e))},toByteArray:function(){return t},toString:function(){var r="";r+="[";for(var e=0;e<t.length;e+=1)e>0&&(r+=","),r+=t[e];return r+="]"}};return r},S=function(t){var r=t,e=0,n=0,o=0,i={read:function(){for(;o<8;){if(e>=r.length){if(0==o)return-1;throw"unexpected end of file./"+o}var t=r.charAt(e);if(e+=1,"="==t)return o=0,-1;t.match(/^\s$/)||(n=n<<6|a(t.charCodeAt(0)),o+=6)}var i=n>>>o-8&255;return o-=8,i}},a=function(t){if(65<=t&&t<=90)return t-65;if(97<=t&&t<=122)return t-97+26;if(48<=t&&t<=57)return t-48+52;if(43==t)return 62;if(47==t)return 63;throw"c:"+t};return i},I=function(t,r,e){for(var n=function(t,r){var e=t,n=r,o=new Array(t*r),i={setPixel:function(t,r,n){o[r*e+t]=n},write:function(t){t.writeString("GIF87a"),t.writeShort(e),t.writeShort(n),t.writeByte(128),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(0),t.writeByte(255),t.writeByte(255),t.writeByte(255),t.writeString(","),t.writeShort(0),t.writeShort(0),t.writeShort(e),t.writeShort(n),t.writeByte(0);var r=a(2);t.writeByte(2);for(var o=0;r.length-o>255;)t.writeByte(255),t.writeBytes(r,o,255),o+=255;t.writeByte(r.length-o),t.writeBytes(r,o,r.length-o),t.writeByte(0),t.writeString(";")}},a=function(t){for(var r=1<<t,e=1+(1<<t),n=t+1,i=u(),a=0;a<r;a+=1)i.add(String.fromCharCode(a));i.add(String.fromCharCode(r)),i.add(String.fromCharCode(e));var f,c,g,l=D(),h=(f=l,c=0,g=0,{write:function(t,r){if(t>>>r!=0)throw"length over";for(;c+r>=8;)f.writeByte(255&(t<<c|g)),r-=8-c,t>>>=8-c,g=0,c=0;g|=t<<c,c+=r},flush:function(){c>0&&f.writeByte(g)}});h.write(r,n);var s=0,v=String.fromCharCode(o[s]);for(s+=1;s<o.length;){var d=String.fromCharCode(o[s]);s+=1,i.contains(v+d)?v+=d:(h.write(i.indexOf(v),n),i.size()<4095&&(i.size()==1<<n&&(n+=1),i.add(v+d)),v=d)}return h.write(i.indexOf(v),n),h.write(e,n),h.flush(),l.toByteArray()},u=function(){var t={},r=0,e={add:function(n){if(e.contains(n))throw"dup key:"+n;t[n]=r,r+=1},size:function(){return r},indexOf:function(r){return t[r]},contains:function(r){return void 0!==t[r]}};return e};return i}(t,r),o=0;o<r;o+=1)for(var i=0;i<t;i+=1)n.setPixel(i,o,e(i,o));var a=D();n.write(a);for(var u=function(){var t=0,r=0,e=0,n="",o={},i=function(t){n+=String.fromCharCode(a(63&t))},a=function(t){if(t<0);else{if(t<26)return 65+t;if(t<52)return t-26+97;if(t<62)return t-52+48;if(62==t)return 43;if(63==t)return 47}throw"n:"+t};return o.writeByte=function(n){for(t=t<<8|255&n,r+=8,e+=1;r>=6;)i(t>>>r-6),r-=6},o.flush=function(){if(r>0&&(i(t<<6-r),t=0,r=0),e%3!=0)for(var o=3-e%3,a=0;a<o;a+=1)n+="="},o.toString=function(){return n},o}(),f=a.toByteArray(),c=0;c<f.length;c+=1)u.writeByte(f[c]);return u.flush(),"data:image/gif;base64,"+u};return t}();qrcode.stringToBytesFuncs["UTF-8"]=function(t){return function(t){for(var r=[],e=0;e<t.length;e++){var n=t.charCodeAt(e);n<128?r.push(n):n<2048?r.push(192|n>>6,128|63&n):n<55296||n>=57344?r.push(224|n>>12,128|n>>6&63,128|63&n):(e++,n=65536+((1023&n)<<10|1023&t.charCodeAt(e)),r.push(240|n>>18,128|n>>12&63,128|n>>6&63,128|63&n))}return r}(t)},function(t){"function"==typeof define&&define.amd?define([],t):"object"==typeof exports&&(module.exports=t())}((function(){return qrcode}));
+</script>
+<script>
+/* ===================================================================
+   KONFIGURATION FÜR LEHRKRÄFTE
+   Tragen Sie bei kiTutorUrl den Link zu Ihrem fobizz-KI-Assistenten
+   bzw. fobizz-Klassenraum ein, z. B. "https://..."
+   =================================================================== */
+const KONFIG = {
+  kiTutorUrl: "",
+  kiTutorName: "KI-Tutor"
+};
+/* =================================================================== */
+
+(function(){
+"use strict";
+const PI = Math.PI;
+const $ = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- Zahlen formatieren ---------- */
+function toFrac(v, maxDen=12){
+  if(!isFinite(v)) return null;
+  for(let d=1; d<=maxDen; d++){ const n=Math.round(v*d); if(Math.abs(n/d - v) < 1e-9) return [n,d]; }
+  return null;
+}
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
+function deNum(v, digits=2){
+  const r = Math.round(v*Math.pow(10,digits))/Math.pow(10,digits);
+  let s = (Object.is(r,-0)?0:r).toString();
+  return s.replace('-', '−').replace('.', ',');
+}
+function fr(n,d){ return `<span class="fr"><span>${n}</span><span>${d}</span></span>`; }
+function fmtNum(v, html=true){
+  const f = toFrac(v, 12);
+  if(f){
+    const [n,d]=f;
+    if(d===1) return deNum(n,0);
+    if(d===2||d===4) return deNum(v,2);
+    const sign = n<0?'−':'';
+    return html ? sign+fr(Math.abs(n),d) : `${sign}${Math.abs(n)}/${d}`;
+  }
+  return deNum(v,2);
+}
+function fmtPi(v, html=true){
+  if(Math.abs(v)<1e-12) return '0';
+  const f = toFrac(v/PI, 12);
+  if(!f) return deNum(v,2);
+  let [n,d]=f; const sign=n<0?'−':''; n=Math.abs(n);
+  const num = n===1?'π':n+'π';
+  if(d===1) return sign+num;
+  return html ? sign+fr(num,d) : `${sign}${num}/${d}`;
+}
+/* exakter Anzeigewert: π-Vielfaches oder Zahl */
+function fmtExact(v, html=true){
+  if(toFrac(v,12)) return fmtNum(v,html);
+  if(toFrac(v/PI,12)) return fmtPi(v,html);
+  return deNum(v,3);
+}
+
+/* ---------- Eingaben verstehen (π, Brüche, Komma) ---------- */
+function parseExpr(str){
+  if(str==null) return NaN;
+  let s = String(str).trim().toLowerCase()
+    .replace(/\s+/g,'')
+    .replace(/^[a-zäöü_]+=/,'')
+    .replace(/[−–—]/g,'-')
+    .replace(/[·×⋅*]/g,'*')
+    .replace(/:/g,'/')
+    .replace(/,/g,'.')
+    .replace(/pi|π/g,'π')
+    .replace(/½/g,'(1/2)').replace(/¼/g,'(1/4)').replace(/¾/g,'(3/4)').replace(/⅓/g,'(1/3)');
+  if(!s) return NaN;
+  let i=0;
+  const peek=()=>s[i];
+  function num(){ const m=/^(\d+(\.\d*)?|\.\d+)/.exec(s.slice(i)); if(!m) return null; i+=m[0].length; return parseFloat(m[0]); }
+  function factor(){
+    const c=peek();
+    if(c==='+'){i++; return factor();}
+    if(c==='-'){i++; return -factor();}
+    if(c==='('){i++; const v=expr(); if(peek()!==')') throw new Error('klammer'); i++; return v;}
+    if(c==='π'){i++; return PI;}
+    const n=num(); if(n===null) throw new Error('zahl'); return n;
+  }
+  function term(){
+    let v=factor();
+    while(i<s.length){
+      const c=peek();
+      if(c==='*'){i++; v*=factor();}
+      else if(c==='/'){i++; v/=factor();}
+      else if(c==='π'||c==='('||/[\d.]/.test(c)){ v*=factor(); }
+      else break;
+    }
+    return v;
+  }
+  function expr(){
+    let v=term();
+    while(i<s.length){ const c=peek(); if(c==='+'){i++; v+=term();} else if(c==='-'){i++; v-=term();} else break; }
+    return v;
+  }
+  try{ const v=expr(); if(i!==s.length||!isFinite(v)) return NaN; return v; }catch(e){ return NaN; }
+}
+
+/* ---------- Mathe-Satz: Brüche & kursive Variablen ---------- */
+function prepMath(root){
+  $$('.fr', root).forEach(el=>{
+    const ch=el.children;
+    if(ch.length===2 && ch[0].tagName==='SPAN' && ch[1].tagName==='SPAN') return;
+    const h=el.innerHTML; let k=-1;
+    for(let j=0;j<h.length;j++){ if(h[j]==='/' && h[j-1]!=='<'){ k=j; break; } }
+    if(k<0) return;
+    el.innerHTML=`<span>${h.slice(0,k)}</span><span>${h.slice(k+1)}</span>`;
+  });
+  const ms = root.matches && root.matches('.m,.formula') ? [root] : $$('.m,.formula', root);
+  ms.forEach(m=>{
+    const walker=document.createTreeWalker(m, NodeFilter.SHOW_TEXT);
+    const nodes=[]; while(walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(t=>{
+      if(t.parentElement && (t.parentElement.closest('i')||t.parentElement.tagName==='SUB')) return;
+      const parts=t.nodeValue.split(/([A-Za-zÄÖÜäöüß]+)/);
+      if(parts.length<2) return;
+      if(!parts.some(p=>/^[A-Za-z]$/.test(p))) return;
+      const frag=document.createDocumentFragment();
+      parts.forEach(p=>{
+        if(/^[A-Za-z]$/.test(p)){ const i=document.createElement('i'); i.textContent=p; frag.appendChild(i); }
+        else if(p) frag.appendChild(document.createTextNode(p));
+      });
+      t.parentNode.replaceChild(frag,t);
+    });
+  });
+}
+function plainText(node){
+  const c=node.cloneNode(true);
+  $$('.fr',c).forEach(f=>{
+    const sp=f.children; if(sp.length<2) return;
+    let n=sp[0].textContent.trim(), d=sp[1].textContent.trim();
+    if(/[\s+−-]/.test(n.replace(/^−/,''))) n='('+n+')';
+    if(/[\s+−-]/.test(d)) d='('+d+')';
+    f.replaceWith(document.createTextNode(n+'/'+d));
+  });
+  $$('sub',c).forEach(s=>s.replaceWith(document.createTextNode('_'+s.textContent)));
+  $$('select,.pi-btn,.plot-host',c).forEach(s=>s.remove());
+  return c.textContent.replace(/\s+/g,' ').trim();
+}
+
+/* ---------- Funktionsplotter (SVG) ---------- */
+const SVGNS='http://www.w3.org/2000/svg';
+function sv(tag, attrs, parent){
+  const e=document.createElementNS(SVGNS,tag);
+  if(attrs) for(const k in attrs){ if(attrs[k]!==undefined&&attrs[k]!==null) e.setAttribute(k, attrs[k]); }
+  if(parent) parent.appendChild(e);
+  return e;
+}
+function svText(parent, x, y, str, attrs){
+  const t=sv('text', Object.assign({x:x.toFixed(1), y:y.toFixed(1)}, attrs||{}), parent); t.textContent=str; return t;
+}
+const allPlots=[];
+let plotUid=0;
+class Plot{
+  constructor(host, opts){
+    this.host = typeof host==='string' ? document.getElementById(host) : host;
+    this.o = Object.assign({xmin:-1,xmax:10,ymin:-3,ymax:3, xPi:true, xMajor:[1,2], xMinor:[1,4], xNumMajor:1, xNumMinor:0.5,
+      yMajor:1, yMinor:0.5, aspect:.45, minH:210, maxW:900, padL:34, padR:14, padT:14, padB:34, label:'Funktionsgraph'}, opts||{});
+    this.id='pc'+(++plotUid);
+    this.svg=sv('svg',{class:'plot', role:'img', 'aria-label':this.o.label}, this.host);
+    this.last={};
+    allPlots.push(this);
+  }
+  X(x){const o=this.o; return o.padL + (x-o.xmin)/(o.xmax-o.xmin)*(this.W-o.padL-o.padR);}
+  Y(y){const o=this.o; return o.padT + (o.ymax-y)/(o.ymax-o.ymin)*(this.H-o.padT-o.padB);}
+  set(r){ Object.assign(this.o, r); }
+  render(L){
+    this.last = L = L || this.last || {};
+    const o=this.o, s=this.svg;
+    const hw=this.host.clientWidth;
+    const W=this.W=Math.round(hw>0 ? Math.min(Math.max(hw,260), o.maxW) : 640);
+    const H=this.H=Math.round(Math.max(o.minH, W*o.aspect));
+    s.setAttribute('viewBox',`0 0 ${W} ${H}`);
+    while(s.firstChild) s.removeChild(s.firstChild);
+    const x0=o.padL, x1=W-o.padR, y0=o.padT, y1=H-o.padB;
+    const defs=sv('defs',null,s); const cp=sv('clipPath',{id:this.id},defs);
+    sv('rect',{x:x0,y:y0,width:x1-x0,height:y1-y0},cp);
+    sv('rect',{x:x0,y:y0,width:x1-x0,height:y1-y0,class:'pl-bg'},s);
+    const grid=sv('g',null,s);
+    const majX = o.xPi ? PI*o.xMajor[0]/o.xMajor[1] : o.xNumMajor;
+    const minX = o.xPi ? PI*o.xMinor[0]/o.xMinor[1] : o.xNumMinor;
+    const pxPer = (x1-x0)/(o.xmax-o.xmin), pyPer=(y1-y0)/(o.ymax-o.ymin);
+    // Gitter
+    if(minX*pxPer>=5) for(let k=Math.ceil(o.xmin/minX-1e-9); k*minX<=o.xmax+1e-9; k++){ const X=this.X(k*minX); sv('line',{x1:X,y1:y0,x2:X,y2:y1,class:'g-min'},grid); }
+    if(o.yMinor*pyPer>=5) for(let k=Math.ceil(o.ymin/o.yMinor-1e-9); k*o.yMinor<=o.ymax+1e-9; k++){ const Y=this.Y(k*o.yMinor); sv('line',{x1:x0,y1:Y,x2:x1,y2:Y,class:'g-min'},grid); }
+    for(let k=Math.ceil(o.xmin/majX-1e-9); k*majX<=o.xmax+1e-9; k++){ const X=this.X(k*majX); sv('line',{x1:X,y1:y0,x2:X,y2:y1,class:'g-maj'},grid); }
+    for(let k=Math.ceil(o.ymin/o.yMajor-1e-9); k*o.yMajor<=o.ymax+1e-9; k++){ const Y=this.Y(k*o.yMajor); sv('line',{x1:x0,y1:Y,x2:x1,y2:Y,class:'g-maj'},grid); }
+    // Achsen
+    const ax = (o.ymin<=0&&o.ymax>=0) ? this.Y(0) : y1;
+    const ay = (o.xmin<=0&&o.xmax>=0) ? this.X(0) : x0;
+    const ag=sv('g',null,s);
+    sv('line',{x1:x0,y1:ax,x2:x1,y2:ax,class:'axis'},ag);
+    sv('polygon',{points:`${x1},${ax} ${x1-9},${ax-4.5} ${x1-9},${ax+4.5}`,class:'axhead'},ag);
+    sv('line',{x1:ay,y1:y1,x2:ay,y2:y0,class:'axis'},ag);
+    sv('polygon',{points:`${ay},${y0} ${ay-4.5},${y0+9} ${ay+4.5},${y0+9}`,class:'axhead'},ag);
+    svText(ag, x1-4, ax-9, 'x', {class:'axl','text-anchor':'end'});
+    svText(ag, ay+9, y0+12, 'y', {class:'axl'});
+    // x-Beschriftung
+    const lg=sv('g',null,s);
+    const needPx = o.xPi ? 30 : 22;
+    const every = Math.max(1, Math.ceil(needPx/(majX*pxPer)));
+    for(let k=Math.ceil(o.xmin/majX-1e-9); k*majX<=o.xmax+1e-9; k++){
+      if(k===0 || k%every!==0) continue;
+      const X=this.X(k*majX); if(X>x1-14||X<x0+4) continue;
+      sv('line',{x1:X,y1:ax-3,x2:X,y2:ax+3,class:'axis'},lg);
+      if(o.xPi){
+        let n=k*o.xMajor[0], d=o.xMajor[1]; const g=gcd(n,d); n/=g; d/=g;
+        const sign=n<0?'−':''; const an=Math.abs(n);
+        const numS = sign + (an===1?'π':an+'π');
+        if(d===1){ svText(lg, X, ax+17, numS, {'text-anchor':'middle', class:'pi'}); }
+        else{
+          svText(lg, X, ax+15, numS, {'text-anchor':'middle', class:'pi'});
+          sv('line',{x1:X-8,y1:ax+18.5,x2:X+8,y2:ax+18.5,class:'fbar'},lg);
+          svText(lg, X, ax+31, String(d), {'text-anchor':'middle', class:'pi'});
+        }
+      } else {
+        svText(lg, X, ax+17, deNum(k*majX,2), {'text-anchor':'middle'});
+      }
+    }
+    // y-Beschriftung
+    const yEvery = Math.max(1, Math.ceil(18/(o.yMajor*pyPer)));
+    for(let k=Math.ceil(o.ymin/o.yMajor-1e-9); k*o.yMajor<=o.ymax+1e-9; k++){
+      if(k===0 || k%yEvery!==0) continue;
+      const Y=this.Y(k*o.yMajor); if(Y<y0+10) continue;
+      sv('line',{x1:ay-3,y1:Y,x2:ay+3,y2:Y,class:'axis'},lg);
+      svText(lg, ay-6, Y+4, deNum(k*o.yMajor,2), {'text-anchor':'end'});
+    }
+    if(o.ymin<=0&&o.ymax>=0&&o.xmin<=0&&o.xmax>=0) svText(lg, ay-6, ax+15, '0', {'text-anchor':'end'});
+    // Ebenen
+    const clip=`url(#${this.id})`;
+    const content=sv('g',{'clip-path':clip},s);
+    (L.hlines||[]).forEach(h=>{
+      const Y=this.Y(h.y);
+      sv('line',{x1:x0,y1:Y,x2:x1,y2:Y,style:`stroke:${h.color||'var(--muted)'};stroke-width:${h.w||1.6};stroke-dasharray:${h.dash||'7 5'}`},content);
+    });
+    (L.curves||[]).forEach(c=>{
+      const N=Math.max(320, Math.round((x1-x0)*1.6));
+      let d='', pen=false;
+      for(let i=0;i<=N;i++){
+        const x=o.xmin+(o.xmax-o.xmin)*i/N; const y=c.f(x);
+        if(!isFinite(y)){pen=false; continue;}
+        const py=this.Y(Math.max(o.ymin-40, Math.min(o.ymax+40, y)));
+        d+=(pen?'L':'M')+this.X(x).toFixed(1)+' '+py.toFixed(1); pen=true;
+      }
+      sv('path',{d, class:'curve', style:`stroke:${c.color};stroke-width:${c.w||2.8};${c.dash?'stroke-dasharray:'+c.dash+';':''}${c.op!=null?'opacity:'+c.op+';':''}`},content);
+    });
+    const top=sv('g',null,s);
+    (L.brackets||[]).forEach(b=>{
+      const X1=this.X(b.x1), X2=this.X(b.x2), Y=this.Y(b.y);
+      this.arrow(top, X1, Y, X2, Y, b.color, true);
+      sv('line',{x1:X1,y1:Y-6,x2:X1,y2:Y+6,style:`stroke:${b.color};stroke-width:1.6`},top);
+      sv('line',{x1:X2,y1:Y-6,x2:X2,y2:Y+6,style:`stroke:${b.color};stroke-width:1.6`},top);
+      if(b.label) svText(top, (X1+X2)/2, Y+(b.below?18:-7), b.label, {'text-anchor':'middle', class:'plabel', style:`fill:${b.color};font-weight:700`});
+    });
+    (L.arrows||[]).forEach(a=>{
+      const X1=this.X(a.x1), Y1=this.Y(a.y1), X2=this.X(a.x2), Y2=this.Y(a.y2);
+      if(Math.hypot(X2-X1,Y2-Y1)<4) return;
+      this.arrow(top, X1, Y1, X2, Y2, a.color, a.both);
+      if(a.label){
+        const lx = a.lx!=null? this.X(a.lx) : (X1+X2)/2 + (a.dx||0);
+        const ly = a.ly!=null? this.Y(a.ly) : (Y1+Y2)/2 + (a.dy!=null?a.dy:-7);
+        svText(top, lx, ly, a.label, {'text-anchor':a.anchor||'middle', class:'plabel', style:`fill:${a.color};font-weight:700`});
+      }
+    });
+    (L.hlines||[]).forEach(h=>{
+      if(!h.label) return;
+      const Y=this.Y(h.y); if(Y<y0||Y>y1) return;
+      const lx = h.lx!=null ? this.X(h.lx) : x1-12;
+      svText(top, lx, Y+(h.below?16:-6), h.label, {'text-anchor':h.lx!=null?'start':'end', class:'plabel', style:`fill:${h.color||'var(--muted)'}`});
+    });
+    (L.curves||[]).forEach(c=>{
+      if(!c.label) return;
+      const lx=c.labelAt; const ly=c.f(lx);
+      const X=this.X(lx)+(c.dx||0); let Y=this.Y(ly)+(c.dy!=null?c.dy:-10);
+      Y=Math.max(y0+14, Math.min(y1-6, Y));
+      svText(top, X, Y, c.label, {class:'clabel','text-anchor':c.anchor||'middle', style:`fill:${c.color}`});
+    });
+    (L.points||[]).forEach(p=>{
+      const X=this.X(p.x), Y=this.Y(p.y);
+      if(X<x0-2||X>x1+2||Y<y0-2||Y>y1+2) return;
+      if(p.shape==='dot') sv('circle',{cx:X,cy:Y,r:4.6,style:`fill:${p.color};stroke:var(--sheet);stroke-width:1.6`},top);
+      else { sv('line',{x1:X-5,y1:Y-5,x2:X+5,y2:Y+5,style:`stroke:${p.color};stroke-width:2.4`},top); sv('line',{x1:X-5,y1:Y+5,x2:X+5,y2:Y-5,style:`stroke:${p.color};stroke-width:2.4`},top); }
+      if(p.label){
+        const pos=p.pos||'n'; let dx=0, dy=-11, anc='middle';
+        if(pos==='s'){dy=21;} if(pos==='e'){dx=10;dy=5;anc='start';} if(pos==='w'){dx=-10;dy=5;anc='end';}
+        if(pos==='ne'){dx=7;dy=-9;anc='start';} if(pos==='nw'){dx=-7;dy=-9;anc='end';}
+        if(pos==='se'){dx=7;dy=19;anc='start';} if(pos==='sw'){dx=-7;dy=19;anc='end';}
+        let tx=X+dx; const ty=Math.max(y0+12, Math.min(y1-4, Y+dy));
+        if(anc==='start' && tx>x1-60) { tx=X-dx; anc='end'; }
+        if(anc==='end' && tx<x0+60) { tx=X-dx; anc='start'; }
+        svText(top, tx, ty, p.label, {class:'plabel','text-anchor':anc, style:`fill:${p.lc||'var(--ink)'}`});
+      }
+    });
+  }
+  arrow(g, X1, Y1, X2, Y2, color, both){
+    sv('line',{x1:X1,y1:Y1,x2:X2,y2:Y2,style:`stroke:${color};stroke-width:2`},g);
+    const head=(xa,ya,xb,yb)=>{ const ang=Math.atan2(yb-ya,xb-xa), L=9, w=4.5;
+      const bx=xb-L*Math.cos(ang), by=yb-L*Math.sin(ang);
+      sv('polygon',{points:`${xb},${yb} ${bx+w*Math.sin(ang)},${by-w*Math.cos(ang)} ${bx-w*Math.sin(ang)},${by+w*Math.cos(ang)}`, style:`fill:${color}`},g); };
+    head(X1,Y1,X2,Y2); if(both) head(X2,Y2,X1,Y1);
+  }
+}
+function rerenderVisible(){ allPlots.forEach(p=>{ if(p.host.offsetParent!==null) p.render(p.last); }); }
+let rzT=null;
+window.addEventListener('resize',()=>{ clearTimeout(rzT); rzT=setTimeout(rerenderVisible,140); });
+
+const sinF=x=>Math.sin(x);
+const C={f:'var(--c-f)',g:'var(--c-g)',h:'var(--c-h)',i:'var(--c-i)',j:'var(--c-j)',ref:'var(--c-ref)',acc:'var(--accent)',ink:'var(--ink)',muted:'var(--muted)'};
+const fP=(a,b,c,d)=>x=>a*Math.sin(b*(x-c))+d;
+
+/* ---------- Zustand ---------- */
+const STORE_KEY='sinus-lernpfad-v1';
+let state={cur:0, q:{}, v:{}, seen:{}, train:0};
+function load(){ try{ const s=localStorage.getItem(STORE_KEY); if(s){ const p=JSON.parse(s); if(p&&typeof p==='object') state=Object.assign(state,p); } }catch(e){} }
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){} }
+load();
+
+/* ---------- Funktionsterm hübsch schreiben ---------- */
+function eqHTML(name,a,b,c,d){
+  let s=`${name}(x) = `;
+  if(Math.abs(a)<1e-9) return s+fmtNum(d);
+  let A = Math.abs(a-1)<1e-9 ? '' : Math.abs(a+1)<1e-9 ? '−' : fmtNum(a)+' · ';
+  const bs = Math.abs(b-1)<1e-9 ? '' : fmtNum(b);
+  let inner;
+  if(Math.abs(c)<1e-9) inner = bs ? bs+'x' : 'x';
+  else { const cs=(c>0?'x − ':'x + ')+fmtPi(Math.abs(c)); inner = bs ? `${bs}(${cs})` : cs; }
+  const D = Math.abs(d)<1e-9 ? '' : (d>0?' + ':' − ')+fmtNum(Math.abs(d));
+  return `${s}${A}sin(${inner})${D}`;
+}
+function describe(a,b,c,d, base='y = sin(x)'){
+  const parts=[];
+  if(Math.abs(a)<1e-9) return 'Für a = 0 ist der Graph eine waagerechte Gerade. Das ist keine Sinuskurve mehr.';
+  if(a<0) parts.push('eine Spiegelung an der x-Achse');
+  if(Math.abs(Math.abs(a)-1)>1e-9) parts.push(`eine Streckung in y-Richtung mit dem Faktor ${fmtNum(Math.abs(a))}`);
+  if(Math.abs(b-1)>1e-9) parts.push(`eine Streckung in x-Richtung mit dem Faktor ${fmtNum(1/b)}`);
+  if(Math.abs(c)>1e-9) parts.push(`eine Verschiebung um ${fmtPi(Math.abs(c))} nach ${c>0?'rechts':'links'}`);
+  if(Math.abs(d)>1e-9) parts.push(`eine Verschiebung um ${fmtNum(Math.abs(d))} nach ${d>0?'oben':'unten'}`);
+  if(!parts.length) return `Das ist der Graph von ${base} selbst.`;
+  const list = parts.length===1 ? parts[0] : parts.slice(0,-1).join(', ')+' und '+parts[parts.length-1];
+  return `Der Graph entsteht aus dem Graphen von <span class="m">${base}</span> durch ${list}.`;
+}
+
+/* ===================================================================
+   SCHRITT 0: Übersicht
+   =================================================================== */
+const p0=new Plot('p0',{xmin:-1.2,xmax:4.3*PI,ymin:-2.6,ymax:3.6,aspect:.42,label:'Graphen f, g, h, i und j aus dem Buch'});
+p0.render({curves:[
+  {f:sinF,color:C.f,w:2.2,label:'f',labelAt:2.5*PI,dy:-10},
+  {f:x=>2*Math.sin(x),color:C.g,w:2.2,label:'g',labelAt:PI/2,dy:-10,op:.9},
+  {f:x=>2*Math.sin(x/2),color:C.h,w:2.2,label:'h',labelAt:PI,dy:-10},
+  {f:x=>2*Math.sin((x-PI/2)/2),color:C.i,w:2.2,label:'i',labelAt:1.5*PI,dy:-10},
+  {f:x=>2*Math.sin((x-PI/2)/2)+1,color:C.j,w:2.6,label:'j',labelAt:1.5*PI,dy:-10}
+]});
+
+/* ===================================================================
+   SCHRITT 1
+   =================================================================== */
+const p1=new Plot('p1',{xmin:-1.2,xmax:4.3*PI,ymin:-2.2,ymax:2.2,aspect:.4,label:'Graph von sin(x)'});
+function draw1(){
+  const k=+$('#r1x').value, x=k*PI/12, y=Math.sin(x);
+  const exact = Math.abs(y*100-Math.round(y*100))<1e-9;
+  $('#o1x').innerHTML=fmtPi(x);
+  $('#ro1').innerHTML=`<span class="m">x = ${fmtPi(x)} ≈ ${deNum(x,2)}</span> &nbsp;→&nbsp; <span class="m">sin(x) ${exact?'=':'≈'} ${deNum(y,2)}</span>`;
+  prepMath($('#ro1'));
+  p1.render({
+    curves:[{f:sinF,color:C.f,label:'f',labelAt:2.5*PI,dy:-10}],
+    points:[{x:0,y:0,color:C.ink,shape:'dot',label:'O',pos:'nw'},{x,y,color:C.f,shape:'dot',label:`(${fmtPi(x,false)} | ${deNum(y,2)})`,pos:y>=0?'n':'s'}]
+  });
+}
+$('#r1x').addEventListener('input',draw1);
+draw1();
+
+/* ===================================================================
+   SCHRITT 2
+   =================================================================== */
+const p2=new Plot('p2',{xmin:-1.2,xmax:4.3*PI,ymin:-3.4,ymax:3.4,aspect:.44,label:'Streckung in y-Richtung'});
+function draw2(){
+  const a=+$('#r2a').value/2;
+  $('#o2a').textContent=deNum(a,1);
+  const A=Math.abs(a);
+  let txt=`<span class="m">${eqHTML('g',a,1,0,0)}</span>: Amplitude <span class="m">A = ${fmtNum(A)}</span>, Periode <span class="m">p = 2π</span>.`;
+  if(a===0) txt='Für <span class="m">a = 0</span> sind alle y-Werte null: Der Graph liegt auf der x-Achse.';
+  else if(a<0) txt+=' Wegen <span class="m">a &lt; 0</span> ist der Graph zusätzlich an der x-Achse gespiegelt.';
+  else if(a<1) txt+=' Der Graph ist flacher als der von sin(x).';
+  $('#ro2').innerHTML=txt; prepMath($('#ro2'));
+  const L={curves:[{f:sinF,color:C.f,w:2,label:'f',labelAt:2.5*PI,dy:a>1?14:-10},{f:x=>a*Math.sin(x),color:C.g,label:'g',labelAt:4.5*PI/1.07,dy:a>=0?-10:16}],arrows:[]};
+  if(Math.abs(a)>=0.5) L.arrows.push({x1:PI/2,y1:0,x2:PI/2,y2:a,color:C.g,both:false,label:`A = ${deNum(A,1)}`,lx:PI/2+0.28,ly:a/2,anchor:'start'});
+  p2.render(L);
+}
+$('#r2a').addEventListener('input',draw2);
+draw2();
+const p2q=new Plot('p2q',{xmin:-1,xmax:2.3*PI,ymin:-2.2,ymax:2.2,aspect:.36,minH:180,label:'Graph zur Aufgabe'});
+p2q.render({curves:[{f:x=>1.5*Math.sin(x),color:C.f}]});
+
+/* ===================================================================
+   SCHRITT 3
+   =================================================================== */
+const B_VALS=[0.5,1,1.5,2,3];
+const p3=new Plot('p3',{xmin:-1.2,xmax:4.3*PI,ymin:-3.2,ymax:2.8,aspect:.44,label:'Streckung in x-Richtung'});
+function draw3(){
+  const b=B_VALS[+$('#r3b').value], p=2*PI/b;
+  $('#o3b').innerHTML=fmtNum(b);
+  $('#ro3').innerHTML=`<span class="m">${eqHTML('h',2,b,0,0)}</span>: Periode <span class="m">p = 2π : ${fmtNum(b)} = ${fmtPi(p)}</span>. Streckung in x-Richtung mit dem Faktor <span class="m">1 : ${fmtNum(b)} = ${fmtNum(1/b)}</span>.`;
+  prepMath($('#ro3'));
+  const L={curves:[{f:x=>2*Math.sin(x),color:C.g,w:2,op:.85,label:'g',labelAt:2.5*PI,dy:-10},{f:x=>2*Math.sin(b*x),color:C.h,label:'h',labelAt:p/4,dy:-10}],brackets:[]};
+  const xe=Math.min(p, 4.3*PI-0.05);
+  L.brackets.push({x1:0,x2:xe,y:-2.6,color:C.h,label:`p = ${fmtPi(p,false)}`,below:true});
+  p3.render(L);
+}
+$('#r3b').addEventListener('input',draw3);
+draw3();
+
+/* ===================================================================
+   SCHRITT 4
+   =================================================================== */
+const p4=new Plot('p4',{xmin:-2.25*PI,xmax:4.3*PI,ymin:-2.7,ymax:2.9,aspect:.44,label:'Verschiebung in x-Richtung'});
+function draw4(){
+  const c=+$('#r4c').value*PI/4;
+  $('#o4c').innerHTML=fmtPi(c);
+  let t=`<span class="m">${eqHTML('i',2,0.5,c,0)}</span>: `;
+  t+= Math.abs(c)<1e-9 ? 'keine Verschiebung.' : `Verschiebung um <span class="m">${fmtPi(Math.abs(c))}</span> nach <b>${c>0?'rechts':'links'}</b>. Startpunkt <span class="m">O'(${fmtPi(c)} | 0)</span>.`;
+  $('#ro4').innerHTML=t; prepMath($('#ro4'));
+  p4.render({
+    curves:[{f:x=>2*Math.sin(x/2),color:C.h,w:2,op:.85,label:'h',labelAt:PI,dy:-10},{f:x=>2*Math.sin((x-c)/2),color:C.i,label:'i',labelAt:c+PI,dy:-10}],
+    arrows:Math.abs(c)>1e-9?[{x1:0,y1:1.25,x2:c,y2:1.25,color:C.i,label:`c = ${fmtPi(c,false)}`,dy:-8}]:[],
+    points:[{x:0,y:0,color:C.h,shape:'dot',label:'O',pos:'sw'},{x:c,y:0,color:C.i,shape:'cross',label:"O'",pos:'se'}]
+  });
+}
+$('#r4c').addEventListener('input',draw4);
+draw4();
+
+/* ===================================================================
+   SCHRITT 5
+   =================================================================== */
+const p5=new Plot('p5',{xmin:-1.2,xmax:4.3*PI,ymin:-5.4,ymax:5.4,aspect:.5,label:'Verschiebung in y-Richtung'});
+const iF=x=>2*Math.sin((x-PI/2)/2);
+function draw5(){
+  const d=+$('#r5d').value/2;
+  $('#o5d').textContent=deNum(d,1);
+  $('#ro5').innerHTML=`<span class="m">${eqHTML('j',2,0.5,PI/2,d)}</span>: Mittellage <span class="m">y = ${deNum(d,1)}</span>, größter Wert <span class="m">${deNum(d+2,1)}</span>, kleinster Wert <span class="m">${deNum(d-2,1)}</span>.`;
+  prepMath($('#ro5'));
+  p5.render({
+    hlines:[{y:d,color:C.j,label:`Mittellage y = ${deNum(d,1)}`,below:d<0}],
+    curves:[{f:iF,color:C.i,w:2,op:.85,label:'i',labelAt:1.5*PI,dy:d>0?16:-10},{f:x=>iF(x)+d,color:C.j,label:'j',labelAt:1.5*PI,dy:d>0?-10:16}],
+    arrows:Math.abs(d)>1e-9?[{x1:2.5*PI,y1:0,x2:2.5*PI,y2:d,color:C.j,label:`d = ${deNum(d,1)}`,lx:2.5*PI+0.3,ly:d/2,anchor:'start'}]:[]
+  });
+}
+$('#r5d').addEventListener('input',draw5);
+draw5();
+
+/* ===================================================================
+   SCHRITT 6: Spielwiese
+   =================================================================== */
+const p6=new Plot('p6',{xmin:-2.25*PI,xmax:4.3*PI,ymin:-6.4,ymax:6.4,aspect:.56,label:'Alle Parameter'});
+function vals6(){ return {a:+$('#r6a').value/2, b:B_VALS[+$('#r6b').value], c:+$('#r6c').value*PI/4, d:+$('#r6d').value/2}; }
+function draw6(){
+  const {a,b,c,d}=vals6(), p=2*PI/b, A=Math.abs(a);
+  $('#o6a').textContent=deNum(a,1); $('#o6b').innerHTML=fmtNum(b); $('#o6c').innerHTML=fmtPi(c); $('#o6d').textContent=deNum(d,1);
+  let r=`<div class="eq-live">${eqHTML('f',a,b,c,d)}</div><p style="margin:0 0 6px">${describe(a,b,c,d)}</p>`;
+  if(a!==0) r+=`<p class="small" style="margin:0">Amplitude <span class="m">A = ${fmtNum(A)}</span> · Periode <span class="m">p = ${fmtPi(p)}</span> · Mittellage <span class="m">y = ${fmtNum(d)}</span> · Startpunkt <span class="m">O'(${fmtPi(c)} | ${fmtNum(d)})</span></p>`;
+  $('#ro6').innerHTML=r; prepMath($('#ro6'));
+  const L={hlines:[{y:d,color:C.acc,label:'Mittellage',below:true}],curves:[{f:sinF,color:C.ref,w:1.8},{f:fP(a,b,c,d),color:C.j,w:3}],points:[]};
+  if(a!==0){
+    L.points.push({x:c,y:d,color:C.acc,shape:'cross',label:"O'",pos:'se'});
+    const xh = c + (a>0? p/4 : 3*p/4);
+    L.points.push({x:xh,y:d+A,color:C.j,shape:'cross',label:'H',pos:'n'});
+  }
+  p6.render(L);
+}
+['#r6a','#r6b','#r6c','#r6d'].forEach(s=>$(s).addEventListener('input',draw6));
+function set6(a,bi,ck,d){ $('#r6a').value=a*2; $('#r6b').value=bi; $('#r6c').value=ck; $('#r6d').value=d*2; draw6(); }
+$('#b6reset').addEventListener('click',()=>set6(1,1,0,0));
+$('#b6j').addEventListener('click',()=>set6(2,0,2,1));
+$('#b6ex2').addEventListener('click',()=>set6(2,0,-1,-1.5));
+draw6();
+
+/* ===================================================================
+   SCHRITT 7: Schrittweise skizzieren (Teilschritt-Betrachter)
+   =================================================================== */
+function makeStageViewer(container, P, range, name){
+  const host=document.createElement('div'); host.className='plot-host'; container.appendChild(host);
+  const bar=document.createElement('div'); bar.className='stepper'; bar.setAttribute('role','group'); bar.setAttribute('aria-label','Teilschritte'); container.appendChild(bar);
+  const text=document.createElement('div'); text.className='stage-text'; text.setAttribute('aria-live','polite'); container.appendChild(text);
+  const plot=new Plot(host, Object.assign({aspect:.48,label:'Schrittweise Skizze'},range));
+  const {a,b,c,d}=P, p=2*PI/b;
+  const f1=x=>a*Math.sin(x), f2=x=>a*Math.sin(b*x), f3=x=>a*Math.sin(b*(x-c)), f4=x=>f3(x)+d;
+  const lbl=(x,y)=>`(${fmtPi(x,false)} | ${deNum(y,2)})`;
+  const names=['Start','1 · a','2 · b','3 · c','4 · d'];
+  const eqFinal=eqHTML(name,a,b,c,d);
+  const texts=[
+    `<p>Ausgangspunkt ist der Graph von <span class="m">y = sin(x)</span> mit Amplitude 1 und Periode 2π.</p>`,
+    `<p><b>a = ${fmtNum(a)}</b>: Streckung in y-Richtung mit dem Faktor ${fmtNum(a)}. Alle y-Werte werden mit ${fmtNum(a)} multipliziert. Amplitude <span class="m">A = ${fmtNum(Math.abs(a))}</span>.</p><p class="small">Graph: <span class="m">y = ${Math.abs(a-1)<1e-9?'':fmtNum(a)+' · '}sin(x)</span></p>`,
+    `<p><b>b = ${fmtNum(b)}</b>: Streckung in x-Richtung mit dem Faktor <span class="m">1 : ${fmtNum(b)} = ${fmtNum(1/b)}</span>. Periode <span class="m">p = 2π : ${fmtNum(b)} = ${fmtPi(p)}</span>.</p><p class="small">Graph: <span class="m">y = ${fmtNum(a)} · sin(${fmtNum(b)}x)</span></p>`,
+    `<p><b>c = ${fmtPi(c)}</b>${c<0?` (denn <span class="m">x + ${fmtPi(-c)} = x − (${fmtPi(c)})</span>)`:''}: Verschiebung um <span class="m">${fmtPi(Math.abs(c))}</span> nach <b>${c<0?'links':'rechts'}</b>. Jeder Punkt wandert um ${fmtPi(Math.abs(c))} zur Seite.</p>`,
+    `<p><b>d = ${fmtNum(d)}</b>: Verschiebung um ${fmtNum(Math.abs(d))} nach <b>${d<0?'unten':'oben'}</b>. Die Mittellage ist jetzt <span class="m">y = ${fmtNum(d)}</span>.</p><p class="result"><span class="m">${eqFinal}</span><br>Hochpunkt <span class="m">H(${fmtPi(c+p/4)} | ${fmtNum(a+d)})</span>, Tiefpunkt <span class="m">T(${fmtPi(c+3*p/4)} | ${fmtNum(-a+d)})</span>, Startpunkt <span class="m">O'(${fmtPi(c)} | ${fmtNum(d)})</span>.</p>`
+  ];
+  function layers(s){
+    if(s===0) return {curves:[{f:sinF,color:C.ref,label:'y = sin(x)',labelAt:PI/2,dy:-10,anchor:'start'}]};
+    if(s===1) return {curves:[{f:sinF,color:C.ref,w:1.8},{f:f1,color:C.f}],points:[{x:PI/2,y:a,color:C.f,label:'H',pos:'n'},{x:1.5*PI,y:-a,color:C.f,label:'T',pos:'s'}]};
+    if(s===2) return {curves:[{f:f1,color:C.f,w:1.8,op:.55},{f:f2,color:C.h}],points:[{x:p/4,y:a,color:C.h,label:'H',pos:'n'},{x:3*p/4,y:-a,color:C.h,label:'T',pos:'s'}]};
+    if(s===3) return {curves:[{f:f2,color:C.h,w:1.8,op:.55},{f:f3,color:C.i}],points:[{x:c+p/4,y:a,color:C.i,label:'H',pos:'n'},{x:c,y:0,color:C.i,label:"O'",pos:c<0?'sw':'se'}],
+      arrows:[{x1:p/4,y1:a+0.45,x2:c+p/4,y2:a+0.45,color:C.i,label:`${fmtPi(Math.abs(c),false)} nach ${c<0?'links':'rechts'}`,dy:-8}]};
+    return {hlines:[{y:d,color:C.i,label:`Mittellage y = ${deNum(d,2)}`,below:true}],curves:[{f:f3,color:C.i,w:1.8,op:.4,dash:'6 5'},{f:f4,color:C.i,w:3.2,label:name,labelAt:c+p/2,dy:-12}],
+      points:[{x:c+p/4,y:a+d,color:C.i,label:'H'+lbl(c+p/4,a+d),pos:'n'},{x:c+3*p/4,y:-a+d,color:C.i,label:'T'+lbl(c+3*p/4,-a+d),pos:'s'},{x:c,y:d,color:C.ink,shape:'dot',label:"O'",pos:'nw'}],
+      arrows:[{x1:c+p/4,y1:a,x2:c+p/4,y2:a+d,color:C.i,label:`${deNum(Math.abs(d),2)} nach ${d<0?'unten':'oben'}`,lx:c+p/4+0.25,ly:a+d/2,anchor:'start'}]};
+  }
+  let cur=0;
+  const btns=names.map((n,i)=>{ const bt=document.createElement('button'); bt.type='button'; bt.textContent=n; bt.addEventListener('click',()=>go(i)); bar.appendChild(bt); return bt; });
+  const next=document.createElement('button'); next.type='button'; next.className='btn small'; next.textContent='Nächster Teilschritt →'; next.style.marginLeft='auto';
+  next.addEventListener('click',()=>go(Math.min(4,cur+1))); bar.appendChild(next);
+  function go(i){ cur=i; btns.forEach((bt,j)=>bt.setAttribute('aria-pressed',String(j===i))); next.disabled=i===4; text.innerHTML=texts[i]; prepMath(text); plot.render(layers(i)); }
+  go(0);
+  return {plot, go};
+}
+const sv7=makeStageViewer($('#sv7'),{a:2,b:0.5,c:-PI/4,d:-1.5},{xmin:-0.6*PI,xmax:4.1*PI,ymin:-4.4,ymax:2.9},'g');
+let sv7k=null, sv7m=null;
+$('#b7k').addEventListener('click',()=>{ const box=$('#sv7k'); box.hidden=false; if(!sv7k) sv7k=makeStageViewer(box,{a:3,b:2,c:PI/4,d:1},{xmin:-0.6*PI,xmax:2.35*PI,ymin:-3.6,ymax:4.9},'k'); sv7k.plot.render(); });
+$('#b7mGraph').addEventListener('click',()=>{ const box=$('#sv7m'); box.hidden=false; if(!sv7m) sv7m=makeStageViewer(box,{a:1.5,b:0.5,c:PI,d:-1},{xmin:-0.6*PI,xmax:5.4*PI,ymin:-3,ymax:2.2},'m'); sv7m.plot.render(); });
+$('#b7mSol').addEventListener('click',()=>{ const b=$('#sol7m'); b.hidden=!b.hidden; $('#b7mSol').textContent=b.hidden?'Mit Musterlösung vergleichen':'Musterlösung ausblenden'; });
+$('#b7mKi').addEventListener('click',()=>{
+  const t=$('#t7m').value.trim();
+  openTutor({task:'Beschreibe, wie der Graph von m(x) = 1,5 · sin(0,5(x − π)) − 1 aus dem Graphen von sin(x) entsteht.', answer:t||'(noch nichts geschrieben)'}, t?'Bitte gib mir Rückmeldung zu meiner Beschreibung. Ist sie fachlich richtig und vollständig? Verrate mir Fehler nicht direkt, sondern gib mir einen Hinweis.':'');
+});
+
+/* ===================================================================
+   Parameter vergleichen (Beispiel 1, Training, Abschluss)
+   =================================================================== */
+function fval(P,x){ return P.a*Math.sin(P.b*(x-P.c))+P.d; }
+function maxDiff(S,T,xr){ let m=0; for(let i=0;i<=300;i++){ const x=xr[0]+(xr[1]-xr[0])*i/300; m=Math.max(m, Math.abs(fval(S,x)-fval(T,x))); } return m; }
+function checkParams(S,T,xr){
+  const A=Math.abs(T.a);
+  const md=maxDiff(S,T,xr);
+  if(md<1e-6) return {ok:true};
+  if(md<0.04*A+0.02) return {ok:true, approx:true};
+  const msgs=[];
+  const near=(u,v)=>Math.abs(u-v)<=0.006*Math.max(1,Math.abs(v));
+  const pT=2*PI/Math.abs(T.b), pS=2*PI/Math.abs(S.b);
+  const dOk=near(S.d,T.d), aOk=near(Math.abs(S.a),A), bOk=near(pS,pT);
+  if(!dOk){
+    if(near(S.d,T.d+A)||near(S.d,T.d-A)) msgs.push('<b>d</b>: Du hast den höchsten oder tiefsten y-Wert genommen. d ist die Mitte: (y<sub>max</sub> + y<sub>min</sub>) : 2.');
+    else msgs.push('<b>d</b> stimmt noch nicht. Die Mittellage liegt genau in der Mitte zwischen höchstem und tiefstem y-Wert.');
+  }
+  if(!aOk){
+    if(near(Math.abs(S.a),2*A)) msgs.push('<b>a</b>: Du hast den ganzen Abstand von oben nach unten genommen. Die Amplitude ist die Hälfte davon.');
+    else msgs.push('<b>a</b> stimmt noch nicht. Die Amplitude ist der Abstand von der Mittellage bis zum Hochpunkt.');
+  }
+  if(!bOk){
+    if(near(Math.abs(S.b),pT)) msgs.push('<b>b</b>: Du hast die Periode p eingetragen. Es gilt aber b = 2π : p.');
+    else if(near(Math.abs(S.b),pT/(2*PI))) msgs.push('<b>b</b>: Du hast p : 2π gerechnet. Richtig ist b = 2π : p.');
+    else msgs.push('<b>b</b> stimmt noch nicht. Lies zuerst die Periode p ab (Abstand zweier benachbarter Hochpunkte) und rechne dann b = 2π : p.');
+  }
+  if(dOk&&aOk&&bOk){
+    const S2=Object.assign({},S,{c:-S.c});
+    if(maxDiff(S2,T,xr)<0.04*A+0.02) msgs.push('<b>c</b>: Vorzeichenfehler. In der Form x − c bedeutet ein positives c eine Verschiebung nach rechts. Liegt der Startpunkt links von 0, ist c negativ.');
+    else{
+      const yAt=fval(T,S.c), slope=fval(T,S.c+1e-4)-fval(T,S.c-1e-4);
+      if(Math.abs(yAt-T.d)<0.03*A+0.01 && slope*Math.sign(S.a)<0) msgs.push('<b>c</b>: An der Stelle x = c liegt der Graph auf der Mittellage, aber er <b>fällt</b> dort. Du brauchst eine Stelle, an der er steigt (oder ein negatives a).');
+      else msgs.push('<b>c</b> stimmt noch nicht. Suche einen Punkt auf der Mittellage, an dem der Graph steigt. Seine x-Koordinate ist c.');
+    }
+  }
+  return {ok:false, msgs};
+}
+
+/* ===================================================================
+   SCHRITT 8: Beispiel 1 (Musterlösung)
+   =================================================================== */
+const p8=new Plot('p8',{xmin:-1.4,xmax:6.6,ymin:-0.6,ymax:5.9,xPi:false,aspect:.58,label:'Graph aus Beispiel 1'});
+const T8={a:2,b:PI/2,c:0.5,d:3};
+function analysisLayers(T, level, opt){
+  opt=opt||{};
+  const p=2*PI/Math.abs(T.b), A=Math.abs(T.a), xr=opt.xr;
+  const L={curves:[{f:x=>fval(T,x),color:C.f,w:3}],points:[],hlines:[],arrows:[],brackets:[]};
+  const hs=[], ts=[];
+  for(let k=-6;k<=12;k++){ const xh=T.c+p/4+k*p, xt=T.c+3*p/4+k*p; if(xh>xr[0]+0.05&&xh<xr[1]-0.05) hs.push(xh); if(xt>xr[0]+0.05&&xt<xr[1]-0.05) ts.push(xt); }
+  const fx = opt.pi ? (v=>fmtPi(v,false)) : (v=>deNum(v,2));
+  if(level>=1){
+    hs.forEach(x=>L.points.push({x,y:T.d+A,color:C.j,label:'H',pos:'w'}));
+    ts.forEach(x=>L.points.push({x,y:T.d-A,color:C.j,label:'T',pos:'w'}));
+    L.hlines.push({y:T.d+A,color:C.j,w:1.2,dash:'3 4',label:opt.nums?`höchster Wert: y = ${deNum(T.d+A,2)}`:'höchster Wert',lx:xr[0]+(xr[1]-xr[0])*0.01,below:true});
+    L.hlines.push({y:T.d-A,color:C.j,w:1.2,dash:'3 4',label:opt.nums?`tiefster Wert: y = ${deNum(T.d-A,2)}`:'tiefster Wert',below:true});
+  }
+  if(level>=2) L.hlines.push({y:T.d,color:C.ink,w:1.6,dash:'8 5',label:opt.nums?`Mittellage y = ${deNum(T.d,2)}`:'Mittellage',below:true});
+  if(level>=3 && hs.length){ L.arrows.push({x1:hs[0],y1:T.d,x2:hs[0],y2:T.d+A,color:C.j,both:true,label:opt.nums?`A = ${deNum(A,2)}`:'A',lx:hs[0]+(xr[1]-xr[0])*0.015,ly:T.d+A/2,anchor:'start'}); }
+  if(level>=4 && hs.length>=2){ L.brackets.push({x1:hs[0],x2:hs[1],y:T.d+A+(opt.bracketDy||0.35),color:C.j,label:opt.nums?`p = ${fx(p)}`:'p'}); }
+  if(level>=5){
+    let xs=T.c; while(xs-p>xr[0]+0.05) xs-=p; while(xs<xr[0]+0.05) xs+=p;
+    if(Math.abs(T.c)<Math.abs(xs)&&T.c>xr[0]) xs=T.c;
+    L.points.push({x:xs,y:T.d,color:C.ink,shape:'dot',label:opt.nums?`O'(${fx(xs)} | ${deNum(T.d,2)})`:"O'",pos:'nw'});
+    if(opt.nums && xs>0.2) L.arrows.push({x1:0,y1:opt.cArrowY!=null?opt.cArrowY:0.25,x2:xs,y2:opt.cArrowY!=null?opt.cArrowY:0.25,color:C.j,label:'c',dy:-6});
+  }
+  return L;
+}
+(function initEx1(){
+  const tx=[
+    `<p>Gegeben ist der Graph. Gesucht ist eine Gleichung der Form <span class="m">f(x) = a · sin(b · (x − c)) + d</span>. Klicke dich durch die Teilschritte und rechne im Heft mit.</p>`,
+    `<p><b>Hoch- und Tiefpunkte ablesen:</b> Der Graph erreicht höchstens <span class="m">y = 5</span> und mindestens <span class="m">y = 1</span>.</p>`,
+    `<p><b>Mittellage:</b> <span class="m">d = (5 + 1) : 2 = 3</span>. Die Gerade <span class="m">y = 3</span> liegt genau in der Mitte.</p>`,
+    `<p><b>Amplitude:</b> <span class="m">A = (5 − 1) : 2 = 2</span>, also <span class="m">a = 2</span>.</p>`,
+    `<p><b>Periode:</b> Zwei benachbarte Hochpunkte liegen bei <span class="m">x = 1,5</span> und <span class="m">x = 5,5</span>. Also <span class="m">p = 4</span> und <span class="m">b = 2π : 4 = <span class="fr">π/2</span></span>.</p>`,
+    `<p><b>Startpunkt:</b> Auf der Mittellage steigt der Graph bei <span class="m">O'(<span class="fr">1/2</span> | 3)</span>. Also <span class="m">c = <span class="fr">1/2</span></span>.</p><p class="result"><b>Ergebnis:</b> <span class="m">f(x) = 2 · sin(<span class="fr">π/2</span> · (x − <span class="fr">1/2</span>)) + 3</span><br><span class="small">Probe mit dem Hochpunkt: <span class="m">f(1,5) = 2 · sin(<span class="fr">π/2</span> · 1) + 3 = 2 · 1 + 3 = 5</span> ✓</span></p>`
+  ];
+  const names=['Start','1 · ablesen','2 · d','3 · a','4 · b','5 · c'];
+  const bar=$('#st8'); let cur=0;
+  const btns=names.map((n,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=n; b.addEventListener('click',()=>go(i)); bar.appendChild(b); return b; });
+  const next=document.createElement('button'); next.type='button'; next.className='btn small'; next.textContent='Nächster Teilschritt →'; next.style.marginLeft='auto';
+  next.addEventListener('click',()=>go(Math.min(5,cur+1))); bar.appendChild(next);
+  function go(i){ cur=i; btns.forEach((b,j)=>b.setAttribute('aria-pressed',String(j===i))); next.disabled=i===5; $('#tx8').innerHTML=tx[i]; prepMath($('#tx8'));
+    p8.render(analysisLayers(T8,i,{nums:true,xr:[-1.4,6.6],cArrowY:0.25})); }
+  go(0);
+})();
+
+/* ===================================================================
+   SCHRITT 8: Training
+   =================================================================== */
+const trPlot=new Plot('p8t',{xmin:-1.5,xmax:7,ymin:-1,ymax:5,xPi:false,aspect:.56,label:'Trainingsgraph'});
+let TR=null, trLevel=0, trOverlay=false, trMode='num', trSolved=false, trLast='';
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+function trNew(){
+  let P, key, guard=0;
+  do{
+    if(trMode==='num'){
+      const p=pick([2,4,6,8]); const A=pick([1,1.5,2,2.5,3]); const d=pick([-1,0,1,2,3]);
+      const cs=[-1,-0.5,0.5,1,1.5,2].filter(c=>c<=p/2 && c>=-p/4);
+      P={a:A,b:2*PI/p,c:pick(cs),d, pi:false};
+    } else {
+      const b=pick([0.5,1,2]); const p=2*PI/b; const A=pick([1,1.5,2,3]); const d=pick([-2,-1,0,1,2]);
+      const ks = b===2?[-1,1,2]: b===1?[-2,-1,1,2,3]:[-4,-2,2,4];
+      P={a:A,b,c:pick(ks)*PI/4,d, pi:true};
+    }
+    key=JSON.stringify(P); guard++;
+  } while(key===trLast && guard<20);
+  trLast=key; TR=P; trLevel=0; trOverlay=false; trSolved=false;
+  const p=2*PI/P.b, A=P.a;
+  let xmin, xmax;
+  if(!P.pi){ xmin=Math.min(-1.5, P.c-0.6); xmax=Math.max(6.6, P.c+1.25*p+0.6); }
+  else { xmin=Math.min(-PI-0.3, P.c-0.5); xmax=Math.max(3*PI, P.c+1.25*p)+0.3; }
+  const span=xmax-xmin;
+  trPlot.set({xmin,xmax,ymin:Math.min(-0.6,P.d-A-0.7),ymax:Math.max(0.6,P.d+A+0.9),xPi:P.pi,
+    xMajor: span>5.6*PI?[1,1]:[1,2], xMinor:[1,4], xNumMajor:1, xNumMinor:0.5});
+  ['#tr-a','#tr-b','#tr-c','#tr-d'].forEach(s=>{ const e=$(s); e.value=''; e.classList.remove('good','bad'); });
+  $('#tr-fb').className='fb'; $('#tr-fb').innerHTML='';
+  $('#tr-overlay').textContent='Meinen Graphen einblenden';
+  updHelpBtns(); trDraw();
+}
+function trStudent(){
+  const S={a:parseExpr($('#tr-a').value), b:parseExpr($('#tr-b').value), c:parseExpr($('#tr-c').value), d:parseExpr($('#tr-d').value)};
+  return S;
+}
+function trDraw(){
+  const o=trPlot.o;
+  const L=analysisLayers(TR,trLevel,{nums:false,pi:TR.pi,xr:[o.xmin,o.xmax],bracketDy:0.45});
+  if(trOverlay){ const S=trStudent(); if([S.a,S.b,S.c,S.d].every(isFinite)) L.curves.push({f:x=>fval(S,x),color:C.g,w:2.4,dash:'7 5',label:'deine',labelAt:o.xmin+(o.xmax-o.xmin)*0.86,dy:-10}); }
+  trPlot.render(L);
+}
+function updHelpBtns(){ ['#tr-h1','#tr-h2','#tr-h3','#tr-h4'].forEach((s,i)=>{ const b=$(s); b.disabled = i>trLevel; b.setAttribute('aria-pressed', String(i<trLevel)); b.classList.toggle('used', i<trLevel); }); }
+['#tr-h1','#tr-h2','#tr-h3','#tr-h4'].forEach((s,i)=>$(s).addEventListener('click',()=>{ trLevel=Math.max(trLevel, i===3?5:i+1); if(i===2) trLevel=Math.max(trLevel,4); if(i===1) trLevel=Math.max(trLevel,3); updHelpBtns(); trDraw(); }));
+function trSolutionHTML(T){
+  const p=2*PI/T.b, A=T.a, fx=T.pi?(v=>fmtPi(v)):(v=>fmtNum(v));
+  return `<div class="sol"><b>Lösungsweg</b><ul>
+    <li><span class="m">y<sub>max</sub> = ${fmtNum(T.d+A)}</span>, <span class="m">y<sub>min</sub> = ${fmtNum(T.d-A)}</span></li>
+    <li><span class="m">d = (${fmtNum(T.d+A)} + ${T.d-A<0?'('+fmtNum(T.d-A)+')':fmtNum(T.d-A)}) : 2 = ${fmtNum(T.d)}</span></li>
+    <li><span class="m">a = (${fmtNum(T.d+A)} − ${T.d-A<0?'('+fmtNum(T.d-A)+')':fmtNum(T.d-A)}) : 2 = ${fmtNum(A)}</span></li>
+    <li>Hochpunkte bei <span class="m">x = ${fx(T.c+p/4)}</span> und <span class="m">x = ${fx(T.c+p/4+p)}</span>, also <span class="m">p = ${fx(p)}</span> und <span class="m">b = 2π : ${T.pi?fmtPi(p):fmtNum(p)} = ${fmtExact(T.b)}</span></li>
+    <li>Steigender Schnitt mit der Mittellage bei <span class="m">x = ${fx(T.c)}</span>, also <span class="m">c = ${fx(T.c)}</span></li>
+  </ul><p style="margin:6px 0 0"><span class="m">${eqHTML('f',A,T.b,T.c,T.d)}</span></p></div>`;
+}
+$('#tr-check').addEventListener('click',()=>{
+  const S=trStudent(), fb=$('#tr-fb');
+  const ids=['#tr-a','#tr-b','#tr-c','#tr-d'];
+  const bad=ids.filter((s,i)=>!isFinite([S.a,S.b,S.c,S.d][i]));
+  ids.forEach(s=>$(s).classList.remove('good','bad'));
+  if(bad.length){ bad.forEach(s=>$(s).classList.add('bad')); fb.className='fb bad'; fb.innerHTML='Bitte fülle alle vier Felder mit Zahlen aus (π als <code>pi</code>).'; return; }
+  if(S.b===0){ $('#tr-b').classList.add('bad'); fb.className='fb bad'; fb.innerHTML='b darf nicht 0 sein.'; return; }
+  const o=trPlot.o; const r=checkParams(S,TR,[o.xmin,o.xmax]);
+  if(r.ok){
+    ids.forEach(s=>$(s).classList.add('good'));
+    fb.className='fb good';
+    fb.innerHTML = (r.approx?'Gerundet richtig. Gib b und c möglichst exakt an, z. B. mit π. ':'Richtig! ')+`<span class="m">${eqHTML('f',S.a,S.b,S.c,S.d)}</span> passt zum Graphen.`;
+    prepMath(fb);
+    if(!trSolved){ trSolved=true; state.train=(state.train||0)+1; state.q['s8-train']='ok'; save(); updateProgress(); updCount(); markQuiz($('.quiz.train'),'ok'); }
+  } else {
+    fb.className='fb bad';
+    fb.innerHTML=`Noch nicht ganz:<ul>${r.msgs.map(m=>'<li>'+m+'</li>').join('')}</ul><button type="button" class="linkbtn ask">Frag den KI-Tutor dazu</button>`;
+    fb.querySelector('.ask').addEventListener('click',()=>openTutor({task:'Training Schritt 8: Funktionsgleichung f(x) = a · sin(b · (x − c)) + d zu einem Graphen bestimmen. Der Graph hat '+trGraphDescr(), answer:`a = ${$('#tr-a').value}, b = ${$('#tr-b').value}, c = ${$('#tr-c').value}, d = ${$('#tr-d').value}`}));
+  }
+});
+function trGraphDescr(){
+  const p=2*PI/TR.b, A=TR.a, fx=TR.pi?(v=>fmtPi(v,false)):(v=>deNum(v,2));
+  return `Hochpunkte bei y = ${deNum(TR.d+A,2)}, Tiefpunkte bei y = ${deNum(TR.d-A,2)}, benachbarte Hochpunkte bei x = ${fx(TR.c+p/4)} und x = ${fx(TR.c+p/4+p)}, steigender Schnitt mit der Mittellage bei x = ${fx(TR.c)}.`;
+}
+$('#tr-overlay').addEventListener('click',()=>{ trOverlay=!trOverlay; $('#tr-overlay').textContent=trOverlay?'Meinen Graphen ausblenden':'Meinen Graphen einblenden'; trDraw(); });
+$('#tr-sol').addEventListener('click',()=>{ const fb=$('#tr-fb'); fb.className='fb info'; fb.innerHTML=trSolutionHTML(TR); prepMath(fb); trLevel=5; updHelpBtns(); trDraw(); });
+$('#tr-new').addEventListener('click',trNew);
+function setMode(m){ trMode=m; $('#tr-num').setAttribute('aria-pressed',String(m==='num')); $('#tr-pi').setAttribute('aria-pressed',String(m==='pi')); trNew(); }
+$('#tr-num').addEventListener('click',()=>setMode('num'));
+$('#tr-pi').addEventListener('click',()=>setMode('pi'));
+function updCount(){ const n=state.train||0; $('#tr-count').textContent = n ? `${n} Aufgabe${n===1?'':'n'} gelöst` : ''; }
+trNew(); updCount();
+
+/* ===================================================================
+   SCHRITT 9: Graphen
+   =================================================================== */
+const p9e2=new Plot('p9e2',{xmin:-1.9,xmax:7.1,ymin:-1.2,ymax:3.3,aspect:.48,label:'Graph zur Aufgabe'});
+p9e2.render({curves:[{f:x=>1.5*Math.sin(2*(x-PI/4))+1,color:C.f,w:3}]});
+const e3r={xmin:-0.75*PI,xmax:2.3*PI,ymin:-2.6,ymax:2.6,aspect:.62,minH:150};
+new Plot('p9e3a',e3r).render({curves:[{f:x=>2*Math.sin(x-PI/2),color:C.f}]});
+new Plot('p9e3b',e3r).render({curves:[{f:x=>2*Math.sin(x+PI/2),color:C.f}]});
+new Plot('p9e3c',e3r).render({curves:[{f:x=>Math.sin(x+PI/2),color:C.f}]});
+
+/* ===================================================================
+   AUFGABEN-LOGIK
+   =================================================================== */
+const quizzes=$$('.quiz');
+function markQuiz(q, st){
+  q.classList.remove('is-ok','is-shown');
+  q.classList.add(st==='ok'?'is-ok':'is-shown');
+  const s=q.querySelector('.q-state'); if(s) s.textContent = st==='ok' ? '✓ gelöst' : 'Lösung angesehen';
+}
+function setQ(q, st, vals){
+  const id=q.dataset.q;
+  if(state.q[id]!=='ok') state.q[id]=st;
+  if(vals) state.v[id]=vals;
+  save(); markQuiz(q, state.q[id]); updateProgress();
+}
+function fbSet(q, cls, html){ const fb=q.querySelector('.fb'); fb.className='fb '+cls; fb.innerHTML=html; prepMath(fb); return fb; }
+function askBtn(q, fb){
+  const b=document.createElement('button'); b.type='button'; b.className='linkbtn ask'; b.textContent='Frag den KI-Tutor dazu';
+  b.style.display='block'; b.style.marginTop='8px';
+  b.addEventListener('click',()=>openTutor({task:plainText(q.querySelector('.q-text')), answer:answersText(q)}));
+  fb.appendChild(b);
+}
+function answersText(q){
+  if(q.dataset.kind==='mc') return q.lastChoice||'';
+  return $$('input.ans,select.ans',q).map(el=>`${el.getAttribute('aria-label')||'Feld'}: ${el.value||'(leer)'}`).join('; ');
+}
+function addPiButtons(scope){
+  $$('input.ans',scope).forEach(inp=>{
+    if(inp.dataset.pib) return; inp.dataset.pib='1';
+    let wrap=inp.parentElement;
+    if(!wrap.classList.contains('fld')){ const w=document.createElement('span'); w.className='fld'; inp.replaceWith(w); w.appendChild(inp); wrap=w; }
+    const b=document.createElement('button'); b.type='button'; b.className='pi-btn'; b.textContent='π'; b.setAttribute('aria-label','π einfügen'); b.tabIndex=-1;
+    b.addEventListener('mousedown',e=>e.preventDefault());
+    b.addEventListener('click',()=>{ const s=inp.selectionStart??inp.value.length, e=inp.selectionEnd??inp.value.length; inp.value=inp.value.slice(0,s)+'π'+inp.value.slice(e); inp.focus(); try{inp.setSelectionRange(s+1,s+1);}catch(_){} });
+    wrap.appendChild(b);
+    inp.setAttribute('autocomplete','off'); inp.setAttribute('autocapitalize','off'); inp.setAttribute('spellcheck','false');
+    inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ const q=inp.closest('.quiz'); const c=q&&q.querySelector('.check'); if(c) c.click(); else if(q&&q.classList.contains('train')) $('#tr-check').click(); } });
+  });
+}
+function checkField(el){
+  const ans=el.dataset.ans;
+  if(el.tagName==='SELECT') return {ok: el.value===ans, empty: el.value===''};
+  const raw=el.value; if(!raw.trim()) return {ok:false, empty:true};
+  const v=parseExpr(raw); if(isNaN(v)) return {ok:false, invalid:true};
+  const t=parseExpr(ans);
+  if(Math.abs(v-t)<=1e-6*Math.max(1,Math.abs(t))) return {ok:true};
+  const isPi = !toFrac(t,12) && toFrac(t/PI,12);
+  if(isPi && Math.abs(v-t)<=0.006*Math.max(1,Math.abs(t))) return {ok:true, approx:true, exact:fmtPi(t)};
+  let msg=null;
+  (el.dataset.wrong||'').split('|').forEach(pair=>{ const k=pair.indexOf('=>'); if(k<0) return; const wv=parseExpr(pair.slice(0,k)); if(isFinite(wv)&&Math.abs(wv-v)<1e-6*Math.max(1,Math.abs(wv))) msg=pair.slice(k+2); });
+  return {ok:false, msg};
+}
+function addActions(q, withCheck){
+  const act=document.createElement('div'); act.className='q-actions';
+  if(withCheck){ const c=document.createElement('button'); c.type='button'; c.className='btn check'; c.textContent='Prüfen'; act.appendChild(c); }
+  if(q.dataset.hint){ const h=document.createElement('button'); h.type='button'; h.className='btn sec hint-b'; h.textContent='Tipp'; act.appendChild(h); }
+  if(q.dataset.solution){ const s=document.createElement('button'); s.type='button'; s.className='btn sec sol-b'; s.textContent='Lösung zeigen'; s.hidden=true; act.appendChild(s); }
+  q.appendChild(act);
+  const fb=document.createElement('div'); fb.className='fb'; fb.setAttribute('aria-live','polite'); q.appendChild(fb);
+  const hb=q.querySelector('.hint-b'); if(hb) hb.addEventListener('click',()=>{ const f=fbSet(q,'info',`<div class="hint"><b>Tipp:</b> ${q.dataset.hint}</div>`); });
+  const sb=q.querySelector('.sol-b'); if(sb) sb.addEventListener('click',()=>{ fbSet(q,'info',`<div class="sol"><b>Lösung:</b> ${q.dataset.solution}</div>`); setQ(q,'shown'); });
+}
+const qCount={};
+quizzes.forEach(q=>{
+  const kind=q.dataset.kind;
+  if(kind!=='train'){
+    const sec=q.closest('section'); const sIdx=sec.id.replace('s','');
+    qCount[sIdx]=(qCount[sIdx]||0)+1;
+    q.dataset.n = sIdx+'.'+qCount[sIdx];
+    const head=document.createElement('div'); head.className='q-head';
+    head.innerHTML=`<span class="q-num">Aufgabe ${q.dataset.n}</span><span class="q-state"></span>`;
+    q.insertBefore(head,q.firstChild);
+  }
+  q.attempts=0;
+  if(kind==='mc'){
+    addActions(q,false);
+    const btns=$$('.mc > button',q);
+    btns.forEach((b,i)=>b.addEventListener('click',()=>{
+      q.lastChoice=plainText(b);
+      if(b.hasAttribute('data-ok')){
+        b.classList.add('good'); btns.forEach(x=>x.disabled=true);
+        fbSet(q,'good','✓ '+(b.dataset.fb||'Richtig!'));
+        setQ(q,'ok',[i]);
+      } else {
+        b.classList.add('bad'); q.attempts++;
+        const fb=fbSet(q,'bad','✗ '+(b.dataset.fb||'Leider falsch. Versuch es noch einmal.')); askBtn(q,fb);
+      }
+    }));
+    const st=state.q[q.dataset.q];
+    if(st){ const v=(state.v[q.dataset.q]||[])[0]; const ok=btns.findIndex(b=>b.hasAttribute('data-ok')); const idx=(v!=null?v:ok); if(btns[idx]) btns[idx].classList.add('good'); btns.forEach(x=>x.disabled=true); markQuiz(q,st); }
+  }
+  else if(kind==='fields' || kind==='params'){
+    addActions(q,true);
+    const els=$$('input.ans,select.ans',q);
+    els.forEach(el=>el.addEventListener('input',()=>el.classList.remove('good','bad')));
+    q.querySelector('.check').addEventListener('click',()=>{
+      const vals=els.map(e=>e.value);
+      if(kind==='fields'){
+        const res=els.map(checkField);
+        els.forEach((el,i)=>{ el.classList.remove('good','bad'); if(!res[i].empty) el.classList.add(res[i].ok?'good':'bad'); });
+        if(res.every(r=>r.ok)){
+          const ap=res.filter(r=>r.approx);
+          fbSet(q,'good','✓ Richtig!'+(ap.length?` Gerundet passt es. Exakt: ${ap.map(r=>r.exact).join(', ')}.`:'')+(q.dataset.ok?' '+q.dataset.ok:''));
+          setQ(q,'ok',vals);
+        } else {
+          q.attempts++;
+          const msgs=[];
+          if(res.some(r=>r.empty)) msgs.push('Fülle bitte alle Felder aus.');
+          if(res.some(r=>r.invalid)) msgs.push('Eine Eingabe ist keine gültige Zahl. Beispiele: <code>3pi/4</code>, <code>1/2</code>, <code>-1,5</code>.');
+          res.forEach(r=>{ if(r.msg) msgs.push(r.msg); });
+          if(!msgs.length) msgs.push('Noch nicht ganz. Die rot markierten Felder stimmen noch nicht.');
+          const fb=fbSet(q,'bad','✗ '+msgs.join(' '));
+          askBtn(q,fb);
+          if(q.attempts>=2){ const sb=q.querySelector('.sol-b'); if(sb) sb.hidden=false; }
+        }
+      } else {
+        const T={}; const tv=q.dataset.target.split('|').map(parseExpr); ['a','b','c','d'].forEach((k,i)=>T[k]=tv[i]);
+        const S={}; els.forEach(el=>S[el.dataset.p]=parseExpr(el.value));
+        els.forEach(el=>el.classList.remove('good','bad'));
+        const miss=els.filter(el=>!isFinite(S[el.dataset.p]));
+        if(miss.length||S.b===0){ miss.forEach(el=>el.classList.add('bad')); fbSet(q,'bad','Bitte fülle alle vier Felder mit Zahlen aus (π als <code>pi</code>). b darf nicht 0 sein.'); return; }
+        const xr=q.dataset.xr.split('|').map(Number);
+        const r=checkParams(S,T,xr);
+        if(r.ok){ els.forEach(el=>el.classList.add('good')); fbSet(q,'good','✓ '+(r.approx?'Gerundet richtig. Gib die Werte möglichst exakt an. ':'Richtig! ')+`<span class="m">${eqHTML('f',S.a,S.b,S.c,S.d)}</span>`); setQ(q,'ok',vals); }
+        else { q.attempts++; const fb=fbSet(q,'bad','Noch nicht ganz:<ul>'+r.msgs.map(m=>'<li>'+m+'</li>').join('')+'</ul>'); askBtn(q,fb); if(q.attempts>=2){ const sb=q.querySelector('.sol-b'); if(sb) sb.hidden=false; } }
+      }
+    });
+    const st=state.q[q.dataset.q];
+    if(st){ const v=state.v[q.dataset.q]; if(v&&st==='ok') els.forEach((el,i)=>{ if(v[i]!=null){ el.value=v[i]; el.classList.add('good'); } }); markQuiz(q,st); }
+  }
+  else if(kind==='train'){
+    if(state.q['s8-train']) markQuiz(q,'ok');
+  }
+});
+addPiButtons(document);
+
+/* ---------- Fortschritt & Navigation ---------- */
+const steps=$$('section.step');
+function quizzesIn(sec){ return $$('.quiz',sec); }
+function updateProgress(){
+  const total=quizzes.length; const solved=quizzes.filter(q=>state.q[q.dataset.q]).length;
+  $('#prog-text').textContent=`${solved} von ${total} Aufgaben bearbeitet`;
+  $('#prog-fill').style.width=(total?solved/total*100:0)+'%';
+  $$('.nav-item').forEach((b,i)=>{ const qs=quizzesIn(steps[i]); const done = qs.length ? qs.every(q=>state.q[q.dataset.q]) : !!state.seen[i]; b.classList.toggle('done',done); });
+  const sum=$('#sum9'); if(sum){
+    const lv=[['basis','Basisinhalte'],['erweitert','Erweiterte Basisinhalte'],['fortgeschritten','Fortgeschrittene Inhalte']];
+    sum.innerHTML=lv.map(([k,n])=>{ const qs=$$(`.level[data-level="${k}"] .quiz`); const ok=qs.filter(q=>state.q[q.dataset.q]==='ok').length; return `<div><span class="small muted">${n}</span><b>${ok} / ${qs.length}</b><span class="small muted">selbst gelöst</span></div>`; }).join('');
+  }
+}
+function buildNav(){
+  const nav=$('#nav');
+  steps.forEach((s,i)=>{
+    const li=document.createElement('li'); const b=document.createElement('button'); b.type='button'; b.className='nav-item';
+    b.innerHTML=`<span class="num">${i}</span><span class="nt">${s.dataset.title}</span><span class="st" aria-hidden="true"></span>`;
+    b.addEventListener('click',()=>show(i)); li.appendChild(b); nav.appendChild(li);
+    const sn=document.createElement('div'); sn.className='step-nav';
+    sn.innerHTML = (i>0?`<button type="button" class="btn sec">← ${steps[i-1].dataset.title}</button>`:'<span></span>') + (i<steps.length-1?`<button type="button" class="btn">Weiter: ${steps[i+1].dataset.title} →</button>`:'');
+    const bs=sn.querySelectorAll('button');
+    if(i>0) bs[0].addEventListener('click',()=>show(i-1));
+    if(i<steps.length-1) bs[bs.length-1].addEventListener('click',()=>show(i+1));
+    s.appendChild(sn);
+  });
+}
+function show(i, scroll=true){
+  i=Math.max(0,Math.min(steps.length-1,i)); state.cur=i; state.seen[i]=1; save();
+  steps.forEach((s,j)=>s.hidden=j!==i);
+  $$('.nav-item').forEach((b,j)=>{ b.classList.toggle('cur',j===i); if(j===i) b.setAttribute('aria-current','step'); else b.removeAttribute('aria-current'); });
+  rerenderVisible(); updateProgress(); updKiStep();
+  if(scroll){ const top=$('#main').getBoundingClientRect().top+window.scrollY-12; window.scrollTo({top:Math.max(0,top),behavior:reduceMotion?'auto':'smooth'}); }
+  if(window.matchMedia('(max-width:880px)').matches){ const c=$('.nav-item.cur'); const nav=$('#nav'); if(c&&nav){ nav.scrollLeft = c.parentElement.offsetLeft - nav.clientWidth/2 + c.clientWidth/2; } }
+}
+let resetArmed=false;
+$('#reset').addEventListener('click',()=>{
+  const b=$('#reset');
+  if(!resetArmed){ resetArmed=true; b.textContent='Wirklich alles zurücksetzen? Nochmal tippen.'; setTimeout(()=>{ resetArmed=false; b.textContent='Fortschritt zurücksetzen'; },4000); return; }
+  try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+  location.reload();
+});
+
+/* ---------- GeoGebra-Befehle kopieren ---------- */
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); return true; }catch(e){
+    const ta=document.createElement('textarea'); ta.value=text; ta.setAttribute('readonly',''); ta.style.position='fixed'; ta.style.top='0'; ta.style.opacity='0'; document.body.appendChild(ta); ta.select();
+    let ok=false; try{ ok=document.execCommand('copy'); }catch(e2){} ta.remove(); return ok;
+  }
+}
+function flash(btn, txt){ const o=btn.dataset.orig||btn.textContent; btn.dataset.orig=o; btn.textContent=txt; setTimeout(()=>btn.textContent=o,1600); }
+$$('.cmd').forEach(c=>{
+  const code=c.querySelector('code'); const b=document.createElement('button'); b.type='button'; b.className='copy'; b.textContent='Kopieren';
+  b.addEventListener('click',async()=>{ const ok=await copyText(code.textContent); if(ok) flash(b,'Kopiert ✓'); else { const r=document.createRange(); r.selectNodeContents(code); const s=getSelection(); s.removeAllRanges(); s.addRange(r); flash(b,'Markiert: Strg+C'); } });
+  c.appendChild(b);
+});
+
+/* ---------- KI-Tutor ---------- */
+let kiUrl = (KONFIG.kiTutorUrl||'').trim();
+try{ const u=new URLSearchParams(location.search).get('ki'); if(u && /^https:\/\//i.test(u)) kiUrl=u; }catch(e){}
+let kiCtx=null;
+const drawer=$('#ki-drawer'), backdrop=$('#ki-backdrop'), fab=$('#ki-fab');
+function updKiStep(){ const s=steps[state.cur]; $('#ki-step').textContent=`Du bist bei: ${state.cur===0?'Start':'Schritt '+state.cur+' · '+s.dataset.title}`; kiPreview(); }
+function composeMsg(){
+  const s=steps[state.cur];
+  let t=`[Lernpfad Sinusfunktionen – ${state.cur===0?'Start':'Schritt '+state.cur+': '+s.dataset.title}]`;
+  if(kiCtx&&kiCtx.task) t+=`\nAufgabe: ${kiCtx.task}`;
+  if(kiCtx&&kiCtx.answer) t+=`\nMeine Eingabe: ${kiCtx.answer}`;
+  t+=`\nMeine Frage: ${$('#ki-frage').value.trim()||'…'}`;
+  return t;
+}
+function kiPreview(){ $('#ki-preview').textContent=composeMsg(); }
+function openTutor(ctx, preset){
+  kiCtx=ctx||null;
+  $('#ki-ctx').hidden=!kiCtx;
+  if(kiCtx) $('#ki-ctx-text').textContent=kiCtx.task + (kiCtx.answer?' · Deine Eingabe: '+kiCtx.answer:'');
+  if(preset) $('#ki-frage').value=preset;
+  drawer.hidden=false; backdrop.hidden=false; fab.setAttribute('aria-expanded','true');
+  updKiStep(); setTimeout(()=>$('#ki-frage').focus(),30);
+}
+function closeTutor(){ drawer.hidden=true; backdrop.hidden=true; fab.setAttribute('aria-expanded','false'); fab.focus(); }
+fab.addEventListener('click',()=>openTutor(null));
+$('#ki-close').addEventListener('click',closeTutor);
+backdrop.addEventListener('click',closeTutor);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!drawer.hidden) closeTutor(); });
+$('#ki-ctx-clear').addEventListener('click',()=>{ kiCtx=null; $('#ki-ctx').hidden=true; kiPreview(); });
+$('#ki-frage').addEventListener('input',kiPreview);
+$$('#ki-chips button').forEach(b=>b.addEventListener('click',()=>{ const ta=$('#ki-frage'); ta.value=(ta.value.trim()?ta.value.trim()+' ':'')+b.textContent; kiPreview(); ta.focus(); }));
+const go=$('#ki-go'), cp=$('#ki-copy'), note=$('#ki-note');
+if(kiUrl){
+  go.hidden=false; go.href=kiUrl; cp.className='btn sec';
+  go.addEventListener('click',()=>{ copyText(composeMsg()); });
+  note.innerHTML=`<p><b>So geht's:</b> Tippe auf „Kopieren und KI-Tutor öffnen“. Im neuen Tab fügst du die Nachricht ins Chatfeld ein (Strg+V bzw. lange tippen → Einfügen) und schickst sie ab.</p><p>Gib keine persönlichen Daten ein.</p>`;
+} else {
+  note.innerHTML=`<p><b>So geht's:</b> Tippe auf „Nachricht kopieren“. Öffne dann den ${KONFIG.kiTutorName} über den Link oder QR-Code deiner Lehrkraft und füge die Nachricht dort ein (Strg+V bzw. lange tippen → Einfügen).</p><p>Gib keine persönlichen Daten ein.</p>`;
+}
+cp.addEventListener('click',async()=>{ const ok=await copyText(composeMsg()); if(ok) flash(cp,'Kopiert ✓'); else { const r=document.createRange(); r.selectNodeContents($('#ki-preview')); const s=getSelection(); s.removeAllRanges(); s.addRange(r); flash(cp,'Text markiert: jetzt kopieren'); } });
+
+/* ---------- QR-Code ---------- */
+const qrModal=$('#qr-modal');
+function pageUrl(){ return location.href.split('#')[0]; }
+function openQR(){
+  const url=pageUrl();
+  const local = location.protocol==='file:' || location.protocol==='blob:' || location.protocol==='about:';
+  $('#qr-url').textContent = local ? 'Die Datei ist gerade nur auf diesem Gerät geöffnet.' : url;
+  $('#qr-hint').textContent = local ? 'Lade die Datei zuerst auf einen Webspace hoch und öffne sie dort. Dann zeigt dieser Knopf den QR-Code zum Link.' : 'Scanne den Code mit der Kamera deines Geräts.';
+  const box=$('#qr-box'); box.innerHTML=''; box.hidden=local; $('#qr-copy').hidden=local;
+  if(!local && typeof qrcode==='function'){
+    try{
+      qrcode.stringToBytes = qrcode.stringToBytesFuncs ? qrcode.stringToBytesFuncs['UTF-8'] : qrcode.stringToBytes;
+      const qr=qrcode(0,'M'); qr.addData(url); qr.make();
+      const n=qr.getModuleCount(), q=4, size=n+2*q; let d='';
+      for(let r=0;r<n;r++) for(let c=0;c<n;c++) if(qr.isDark(r,c)) d+=`M${c+q} ${r+q}h1v1h-1z`;
+      box.innerHTML=`<svg viewBox="0 0 ${size} ${size}" role="img" aria-label="QR-Code mit dem Link zu dieser Seite" shape-rendering="crispEdges"><rect width="${size}" height="${size}" style="fill:var(--qr-bg)"/><path d="${d}" style="fill:var(--qr-fg)"/></svg>`;
+    }catch(e){ box.hidden=true; $('#qr-hint').textContent='Der QR-Code konnte nicht erzeugt werden. Teile den Link oben.'; }
+  }
+  qrModal.hidden=false; $('#qr-close').focus();
+}
+function closeQR(){ qrModal.hidden=true; $('#qr-open').focus(); }
+$('#qr-open').addEventListener('click',openQR);
+$('#qr-close').addEventListener('click',closeQR);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&!qrModal.hidden) closeQR(); });
+$('#qr-copy').addEventListener('click',async()=>{ const ok=await copyText(pageUrl()); flash($('#qr-copy'), ok?'Kopiert ✓':'Link oben markieren und kopieren'); });
+
+/* ---------- Start ---------- */
+prepMath(document.body);
+buildNav();
+show(state.cur||0, false);
+window.__sinus = {parseExpr, checkParams, fmtPi, fmtNum, state:()=>state};
+})();
+</script>
+</body>
+</html>
